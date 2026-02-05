@@ -1,0 +1,241 @@
+.auth-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #101324;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.auth-card {
+  background: #1a1d2e;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+  border: 2px solid #13514b;
+  z-index: 10;
+  position: relative;
+  margin: 20px auto;
+  overflow: hidden;
+}
+
+.auth-card.login-mode {
+  width: 420px;
+ 
+}
+.logo {
+  /* margin-top: 8px; */
+  height: 120px;
+}
+
+.auth-card.signin-mode {
+  width: 500px;
+  /* height: auto; */
+  /* min-height: 600px;
+  max-height: 750px; */
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.auth-header h1 {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.auth-header h1 i {
+  color: #32bcae;
+  font-size: 30px;
+}
+
+.auth-subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin: 0;
+}
+
+.mode-toggle {
+  display: flex;
+  background: #101324;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 25px;
+  border: 2px solid #13514b;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.mode-btn i {
+  font-size: 16px;
+}
+
+.mode-btn:hover {
+  color: #ffffff;
+  background: rgba(50, 188, 174, 0.1);
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, #13514b 0%, #32bcae 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(50, 188, 174, 0.3);
+}
+
+.auth-content {
+  height: auto;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-right: -8px;
+}
+
+.auth-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.auth-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.auth-content::-webkit-scrollbar-thumb {
+  background: #13514b;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.auth-content:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+.auth-content::-webkit-scrollbar-thumb:hover {
+  background: #32bcae;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-footer p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  margin: 0;
+}
+
+.switch-link {
+  background: none;
+  border: none;
+  color: #32bcae;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 5px;
+  transition: all 0.3s ease;
+}
+
+.switch-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.auth-decoration {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.decoration-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  filter: blur(40px);
+}
+
+.decoration-circle:nth-child(1) {
+  width: 300px;
+  height: 300px;
+  top: -100px;
+  right: -100px;
+}
+
+.decoration-circle:nth-child(2) {
+  width: 400px;
+  height: 400px;
+  bottom: -150px;
+  left: -150px;
+}
+
+@media (max-width: 768px) {
+  .auth-card.login-mode,
+  .auth-card.signin-mode {
+    width: 95%;
+    padding: 25px;
+    max-height: 85vh;
+    min-height: auto;
+  }
+  
+  .auth-header h1 {
+    font-size: 24px;
+  }
+  
+  .auth-content {
+    max-height: 55vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card.login-mode,
+  .auth-card.signin-mode {
+    width: 100%;
+    padding: 20px;
+    max-height: 90vh;
+  }
+  
+  .auth-header h1 {
+    font-size: 22px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .mode-btn {
+    padding: 10px;
+    font-size: 13px;
+  }
+  
+  .auth-content {
+    max-height: 60vh;
+  }
+  
+  .auth-container {
+    padding: 10px;
+  }
+}

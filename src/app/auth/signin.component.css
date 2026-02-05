@@ -1,0 +1,390 @@
+.signin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-group label i {
+  color: #32bcae;
+  font-size: 14px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 11px 40px 11px 12px;
+  background: #101324;
+  border: 2px solid #13514b;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.input-wrapper input:focus {
+  outline: none;
+  border-color: #32bcae;
+  box-shadow: 0 0 15px rgba(50, 188, 174, 0.3);
+}
+
+.input-wrapper input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.valid-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #32bcae;
+  font-size: 16px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 0;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: #32bcae;
+}
+
+.password-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  background: #13514b;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.strength-bar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: var(--strength, 0%);
+  transition: width 0.3s ease;
+}
+
+.strength-bar.weak::after {
+  width: 33%;
+  background: #ff6b6b;
+}
+
+.strength-bar.medium::after {
+  width: 66%;
+  background: #ffd93d;
+}
+
+.strength-bar.strong::after {
+  width: 100%;
+  background: #32bcae;
+}
+
+.strength-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  min-width: 45px;
+  text-align: right;
+}
+
+.validation-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  font-size: 11px;
+}
+
+.validation-message .success {
+  color: #32bcae;
+}
+
+.validation-message .error {
+  color: #ff6b6b;
+}
+
+.user-type-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 5px;
+}
+
+.user-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 15px 10px;
+  background: #101324;
+  border: 2px solid #13514b;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.user-type-card:hover {
+  background: rgba(19, 81, 75, 0.2);
+  border-color: #32bcae;
+}
+
+.user-type-card.selected {
+  background: linear-gradient(90deg, rgba(19, 81, 75, 0.3) 0%, rgba(50, 188, 174, 0.1) 100%);
+  border-color: #32bcae;
+  box-shadow: 0 0 15px rgba(50, 188, 174, 0.2);
+}
+
+.type-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.type-info h4 {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.type-info p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.type-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.type-check i {
+  color: #32bcae;
+  font-size: 16px;
+}
+
+.terms-section {
+  margin: 10px 0;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.checkbox-label input {
+  display: none;
+}
+
+.checkmark {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #13514b;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.checkbox-label input:checked + .checkmark {
+  background: #32bcae;
+  border-color: #32bcae;
+}
+
+.checkbox-label input:checked + .checkmark::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 8px;
+  color: #ff6b6b;
+  font-size: 13px;
+  margin-top: 15px;
+}
+
+.error-message i {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.terms-text {
+  flex: 1;
+}
+
+.terms-link {
+  background: none;
+  border: none;
+  color: #32bcae;
+  cursor: pointer;
+  padding: 0;
+  font-size: 12px;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.terms-link:hover {
+  color: #ffffff;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #13514b 0%, #32bcae 100%);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 4px 20px rgba(50, 188, 174, 0.3);
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(50, 188, 174, 0.4);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submit-btn .spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.signin-info {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(19, 81, 75, 0.2);
+  border-radius: 8px;
+  border-left: 3px solid #32bcae;
+  margin-top: 5px;
+}
+
+.signin-info i {
+  color: #32bcae;
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.signin-info p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .password-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .user-type-options {
+    grid-template-columns: 1fr;
+  }
+  
+  .input-wrapper input {
+    padding: 10px 40px 10px 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .signin-form {
+    gap: 15px;
+  }
+  
+  .form-group label {
+    font-size: 12px;
+  }
+  
+  .submit-btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
