@@ -42,6 +42,67 @@
 //   }
 // }
 
+// import { Component } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { Router } from '@angular/router';
+// import { AuthService } from '../../services/auth.service';
+
+// @Component({
+//   selector: 'app-login',
+//   standalone: true,
+//   imports: [CommonModule, FormsModule],
+//   templateUrl: './login.component.html',
+//   styleUrls: ['./login.component.css']
+// })
+// export class LoginComponent {
+//   email: string = '';
+//   password: string = '';
+//   rememberMe: boolean = false;
+//   isLoading: boolean = false;
+//   showPassword: boolean = false;
+//   errorMessage: string = '';
+
+//   constructor(
+//     private authService: AuthService,
+//     private router: Router
+//   ) {}
+
+//   onSubmit(): void {
+//     if (!this.email || !this.password) {
+//       this.errorMessage = 'Veuillez remplir tous les champs';
+//       return;
+//     }
+    
+//     this.isLoading = true;
+//     this.errorMessage = '';
+    
+//     const loginData = {
+//       email: this.email,
+//       password: this.password
+//     };
+
+//     this.authService.login(loginData).subscribe({
+//       next: (response) => {
+//         this.isLoading = false;
+//         this.router.navigate(['/accueil']);
+//       },
+//       error: (error) => {
+//         this.isLoading = false;
+//         this.errorMessage = error.message || 'Email ou mot de passe incorrect';
+//       }
+//     });
+//   }
+
+//   togglePasswordVisibility(): void {
+//     this.showPassword = !this.showPassword;
+//   }
+
+//   get passwordFieldType(): string {
+//     return this.showPassword ? 'text' : 'password';
+//   }
+// }
+
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -85,13 +146,29 @@ export class LoginComponent {
     this.authService.login(loginData).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.router.navigate(['/accueil']);
+        this.redirectBasedOnUserType(response.user.type_user);
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = error.message || 'Email ou mot de passe incorrect';
       }
     });
+  }
+
+  private redirectBasedOnUserType(userType: string): void {
+    switch(userType) {
+      case 'BOUTIQUE':
+        this.router.navigate(['/boutique/dashboard']);
+        break;
+      case 'ACHETEUR':
+        this.router.navigate(['/accueil']);
+        break;
+      case 'ADMIN':
+        this.router.navigate(['/admin']);
+        break;
+      default:
+        this.router.navigate(['/accueil']);
+    }
   }
 
   togglePasswordVisibility(): void {

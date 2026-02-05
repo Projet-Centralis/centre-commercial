@@ -1,0 +1,214 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1>
+      <i class="bi bi-speedometer2"></i>
+      Tableau de bord
+    </h1>
+    <div class="date-selector">
+      <span class="current-date">{{ getCurrentDate() }}</span>
+      <button class="refresh-btn" (click)="loadDashboardData()" [disabled]="isLoading">
+        <i class="bi" [class.bi-arrow-clockwise]="!isLoading" [class.bi-hourglass-split]="isLoading"></i>
+        {{ isLoading ? 'Chargement...' : 'Actualiser' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistiques principales -->
+  <div class="stats-grid">
+    <!-- Ventes totales -->
+    <div class="stat-card primary">
+      <div class="stat-icon">
+        <i class="bi bi-cash-stack"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Ventes totales</h3>
+        <div class="stat-value">{{ formatCurrency(ventesTotales) }}</div>
+        <div class="stat-trend">
+          <i class="bi bi-arrow-up-circle-fill"></i>
+          <span>+12.5% cette semaine</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ventes aujourd'hui -->
+    <div class="stat-card success">
+      <div class="stat-icon">
+        <i class="bi bi-calendar-day"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Ventes aujourd'hui</h3>
+        <div class="stat-value">{{ formatCurrency(ventesAujourdhui) }}</div>
+        <div class="stat-trend">
+          <i class="bi bi-arrow-up-circle-fill"></i>
+          <span>{{ ventesAujourdhui > 0 ? 'En hausse' : 'Aucune vente' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clients -->
+    <div class="stat-card info">
+      <div class="stat-icon">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Clients</h3>
+        <div class="stat-value">{{ nombreClients }}</div>
+        <div class="stat-detail">
+          <span class="new-clients">+{{ nouveauxClients }} nouveaux</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Taux de conversion -->
+    <div class="stat-card warning">
+      <div class="stat-icon">
+        <i class="bi bi-bar-chart-fill"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Taux de conversion</h3>
+        <div class="stat-value">{{ tauxConversion }}%</div>
+        <div class="stat-trend">
+          <i class="bi bi-arrow-up-circle-fill"></i>
+          <span>+3.2% vs dernier mois</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique et produits populaires -->
+  <div class="content-grid">
+    <!-- Graphique des ventes -->
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>
+          <i class="bi bi-graph-up"></i>
+          Ventes de la semaine
+        </h3>
+        <select class="period-select">
+          <option>7 derniers jours</option>
+          <option>30 derniers jours</option>
+          <option>3 derniers mois</option>
+        </select>
+      </div>
+      <div class="chart-container">
+        <div class="chart-bars">
+          <div *ngFor="let vente of ventesJournalieres" class="chart-bar-group">
+            <div class="bar-container">
+              <div 
+                class="bar" 
+                [style.height.%]="getBarHeight(vente.montant)"
+                [style.background]="vente.montant === getVentesMax() ? '#32bcae' : '#13514b'">
+              </div>
+            </div>
+            <div class="bar-label">
+              <span class="day">{{ vente.date }}</span>
+              <span class="amount">{{ formatCurrency(vente.montant) }}</span>
+              <span class="count">{{ vente.nombreVentes }} ventes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Produits populaires -->
+    <div class="products-card">
+      <div class="card-header">
+        <h3>
+          <i class="bi bi-trophy"></i>
+          Produits les plus vendus
+        </h3>
+        <a routerLink="/boutique/produits" class="view-all">Voir tout</a>
+      </div>
+      <div class="products-list">
+        <div *ngFor="let produit of produitsPopulaires" class="product-item">
+          <div class="product-rank">{{ produitsPopulaires.indexOf(produit) + 1 }}</div>
+          <div class="product-info">
+            <h4>{{ produit.nom }}</h4>
+            <span class="product-category">{{ produit.categorie }}</span>
+          </div>
+          <div class="product-stats">
+            <div class="sales-count">{{ produit.ventes }} ventes</div>
+            <div class="revenue">{{ formatCurrency(produit.revenu) }}</div>
+          </div>
+          <div class="product-trend" [style.color]="getTendanceColor(produit.tendance)">
+            <i [class]="getTendanceIcon(produit.tendance)"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prospects clients -->
+  <div class="clients-card">
+    <div class="card-header">
+      <h3>
+        <i class="bi bi-person-badge"></i>
+        Prospects clients récents
+      </h3>
+      <a routerLink="/boutique/clients" class="view-all">Voir tout</a>
+    </div>
+    <div class="clients-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Dernière visite</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let client of prospectsClients">
+            <td class="client-name">{{ client.nom }}</td>
+            <td class="client-email">{{ client.email }}</td>
+            <td class="client-last-visit">{{ client.derniereVisite }}</td>
+            <td>
+              <span class="status-badge" [style.background]="getStatutColor(client.statut)">
+                {{ client.statut | uppercase }}
+              </span>
+            </td>
+            <td class="client-actions">
+              <button class="action-btn email" title="Envoyer un email">
+                <i class="bi bi-envelope"></i>
+              </button>
+              <button class="action-btn view" title="Voir profil">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="action-btn edit" title="Modifier">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Aperçu rapide -->
+  <div class="quick-actions">
+    <h3>
+      <i class="bi bi-lightning-charge"></i>
+      Actions rapides
+    </h3>
+    <div class="actions-grid">
+      <button class="action-card" routerLink="/boutique/produits/ajouter">
+        <i class="bi bi-plus-circle"></i>
+        <span>Ajouter un produit</span>
+      </button>
+      <button class="action-card" routerLink="/boutique/events/creer">
+        <i class="bi bi-calendar-plus"></i>
+        <span>Créer un événement</span>
+      </button>
+      <button class="action-card" routerLink="/boutique/prevision">
+        <i class="bi bi-graph-up-arrow"></i>
+        <span>Voir prévisions</span>
+      </button>
+      <button class="action-card" routerLink="/boutique/loyers">
+        <i class="bi bi-receipt"></i>
+        <span>Payer loyer</span>
+      </button>
+    </div>
+  </div>
+</div>
