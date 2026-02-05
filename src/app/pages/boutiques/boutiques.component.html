@@ -1,0 +1,216 @@
+<div class="boutiques-container">
+  <div class="header">
+    <div class="search-bar">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20"
+        height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Rechercher une boutique..."
+        class="search-input">
+      <button *ngIf="searchTerm" (click)="clearSearch()" class="clear-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <button
+      class="favoris-filter-btn"
+      [class.active]="showOnlyFavoris"
+      (click)="toggleFavorisFilter()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+        viewBox="0 0 24 24" [attr.fill]="showOnlyFavoris ? '#32bcae' : 'none'"
+        stroke="currentColor" stroke-width="2">
+        <path
+          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+      Mes favoris
+      <span *ngIf="favorisIds.size > 0" class="badge">{{ favorisIds.size
+        }}</span>
+    </button>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <!-- Liste des boutiques à gauche -->
+    <div class="boutiques-sidebar">
+      <h2 class="sidebar-title">
+        Boutiques
+        <span class="count">{{ boutiques.length }}</span>
+      </h2>
+
+      <!-- Loader -->
+      <div *ngIf="loading" class="loader-container">
+        <div class="loader"></div>
+        <p>Chargement...</p>
+      </div>
+
+      <!-- Message d'erreur -->
+      <div *ngIf="error" class="error-message">
+        <p>{{ error }}</p>
+        <button (click)="loadBoutiques()" class="retry-btn">Réessayer</button>
+      </div>
+
+      <!-- Liste des boutiques -->
+      <div *ngIf="!loading && !error" class="boutiques-list">
+        <div
+          *ngFor="let boutique of boutiques"
+          class="boutique-item"
+          [class.active]="selectedBoutiqueId === boutique._id"
+          (click)="selectBoutique(boutique)">
+
+          <div class="boutique-item-content">
+            <img
+              [src]="boutique.logo"
+              [alt]="boutique.nom_boutique"
+              class="boutique-logo">
+
+            <div class="boutique-item-info">
+              <h3 class="boutique-name">{{ boutique.nom_boutique }}</h3>
+              <p class="boutique-email">{{ boutique.email_contact }}</p>
+              <p class="boutique-email">
+                Nombre de favoris : {{ favorisCount[boutique._id] || 0 }}
+              </p>
+
+            </div>
+          </div>
+
+          <button
+            class="favori-btn-list"
+            (click)="toggleFavori($event, boutique._id)"
+            [class.active]="isFavori(boutique._id)"
+            title="{{ isFavori(boutique._id) ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              [attr.fill]="isFavori(boutique._id) ? '#32bcae' : 'none'"
+              stroke="currentColor"
+              stroke-width="2">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Message si aucune boutique -->
+        <div *ngIf="boutiques.length === 0" class="empty-state-small">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <p>Aucune boutique trouvée</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone des produits à droite -->
+    <div class="produits-section">
+      <div *ngIf="selectedBoutique" class="boutique-header">
+        <div class="boutique-header-content">
+          <img
+            [src]="selectedBoutique.logo"
+            [alt]="selectedBoutique.nom_boutique"
+            class="boutique-header-logo">
+
+          <div class="boutique-header-info">
+            <h1 class="boutique-header-name">{{ selectedBoutique.nom_boutique
+              }}</h1>
+            <p class="boutique-header-description">{{
+              selectedBoutique.description }}</p>
+            <p class="boutique-email">
+              Nombre de personnes ayant ajouté aux favoris : {{
+              favorisCount[selectedBoutique._id] || 0 }}
+            </p>
+            <div class="boutique-header-meta">
+              <span class="meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
+                  <path
+                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                {{ selectedBoutique.email_contact }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loader produits -->
+      <div *ngIf="loadingProduits" class="loader-container">
+        <div class="loader"></div>
+        <p>Chargement des produits...</p>
+      </div>
+
+      <!-- Liste des produits -->
+      <div *ngIf="!loadingProduits && selectedBoutique" class="produits-grid">
+        <h2 class="section-title">
+          Produits
+          <span class="count">{{ produits.length }}</span>
+        </h2>
+
+        <div *ngIf="produits.length > 0" class="produits-container">
+          <div *ngFor="let produit of produits" class="produit-card">
+            <div class="produit-image">
+              <img
+                *ngFor="let img of produit.images"
+                [src]="'/'+ img"
+                [alt]="produit.nom_produit"
+                class="produit-img" />
+            </div>
+
+            <div class="produit-info">
+              <h3 class="produit-name">{{ produit.nom_produit }}</h3>
+              <p class="produit-description">{{ produit.description }}</p>
+
+              <div class="produit-footer">
+                <div class="produit-price">
+                  <span class="price">{{ produit.prix }} Ar</span>
+                  <!-- <span class="stock">Stock: {{ produit.stock }}</span> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message si aucun produit -->
+        <div *ngIf="produits.length === 0" class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <p>Aucun produit disponible dans cette boutique</p>
+        </div>
+      </div>
+
+      <!-- Message si aucune boutique sélectionnée -->
+      <div *ngIf="!selectedBoutique && !loading" class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <p>Sélectionnez une boutique pour voir ses produits</p>
+      </div>
+    </div>
+  </div>
+</div>
