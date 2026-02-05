@@ -1,0 +1,121 @@
+<div class="home-container">
+  <!-- Section Bienvenue -->
+  <div class="welcome-section">
+    <h1>Bienvenue, Andry</h1>
+    <p>Découvrez les boutiques de notre centre commercial et trouvez ce que vous cherchez</p>
+  </div>
+
+  <!-- Message de chargement -->
+  <div *ngIf="loading" class="loading-message">
+    <i class="bi bi-hourglass-split"></i>
+    Chargement des boutiques...
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="error && !loading" class="error-message">
+    <i class="bi bi-exclamation-triangle"></i>
+    {{ error }}
+    <button (click)="loadBoutiques()">Réessayer</button>
+  </div>
+
+  <div class="content-wrapper" *ngIf="!loading && !error">
+    <!-- Liste des boutiques à gauche -->
+    <div class="boutiques-list">
+      <h2>
+        <i class="bi bi-shop"></i>
+        Nos Boutiques ({{ boutiques.length }})
+      </h2>
+      
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Rechercher une boutique..." [(ngModel)]="searchTerm">
+      </div>
+      
+      <div class="boutiques-scroll">
+        <div 
+          *ngFor="let boutique of filteredBoutiques; let i = index" 
+          class="boutique-card"
+          [class.highlighted]="selectedBoutique?._id === boutique._id"
+          [class.hovered]="hoveredBoutique?._id === boutique._id"
+          (mouseenter)="onBoutiqueHover(boutique)"
+          (mouseleave)="onBoutiqueLeave()"
+          (click)="selectBoutique(boutique)">
+          <div class="boutique-marker" [style.background]="boutique.color">
+            <span class="marker-number">{{ i + 1 }}</span>
+          </div>
+          <div class="boutique-info">
+            <h3>{{ boutique.nom_boutique }}</h3>
+            <p class="category">
+              <i [class]="boutique.icon"></i>
+              {{ boutique.description }}
+            </p>
+            <span class="boutique-hours">
+              <i class="bi bi-envelope"></i>
+              {{ boutique.email_contact }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Message si aucune boutique trouvée -->
+        <div *ngIf="filteredBoutiques.length === 0" class="no-results">
+          <i class="bi bi-search"></i>
+          <p>Aucune boutique trouvée</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carte à droite -->
+    <div class="map-container">
+      <div class="map-header">
+        <h2>
+          <i class="bi bi-map"></i>
+          Plan du Centre
+        </h2>
+        <span class="map-info">Cliquez sur les points pour plus d'infos</span>
+      </div>
+      
+      <div class="map-wrapper">
+        <img src="/map.png" alt="Plan du centre commercial" class="map-image">
+        
+        <!-- Points sur la carte -->
+        <div 
+          *ngFor="let boutique of boutiques; let i = index" 
+          class="map-point"
+          [class.active]="selectedBoutique?._id === boutique._id"
+          [class.hovered]="hoveredBoutique?._id === boutique._id"
+          [style.left.%]="boutique.x"
+          [style.top.%]="boutique.y"
+          [style.background]="boutique.color"
+          (mouseenter)="onPointHover(boutique)"
+          (mouseleave)="onPointLeave()"
+          (click)="selectBoutique(boutique)">
+          <span class="point-number">{{ i + 1 }}</span>
+          <div class="point-pulse" [style.background]="boutique.color"></div>
+        </div>
+
+        <!-- Tooltip au survol du point -->
+        <div 
+          *ngIf="hoveredBoutique" 
+          class="map-tooltip"
+          [style.left.%]="getTooltipX(hoveredBoutique.x || 0)"
+          [style.top.%]="hoveredBoutique.y">
+          <div class="tooltip-arrow" [style.border-top-color]="hoveredBoutique.color"></div>
+          <div class="tooltip-content">
+            <div class="tooltip-header" [style.background]="hoveredBoutique.color">
+              <i [class]="hoveredBoutique.icon"></i>
+              <span class="tooltip-number">{{ getBoutiqueIndex(hoveredBoutique) }}</span>
+            </div>
+            <div class="tooltip-body">
+              <h4>{{ hoveredBoutique.nom_boutique }}</h4>
+              <p class="category">{{ hoveredBoutique.description }}</p>
+              <p class="hours">
+                <i class="bi bi-envelope"></i>
+                {{ hoveredBoutique.email_contact }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>    
