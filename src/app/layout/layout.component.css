@@ -1,0 +1,18 @@
+
+.app-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #101324;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+}
+
+.page-content {
+  flex: 1;
+  padding: 20px;
+  background: #101324;
+}
