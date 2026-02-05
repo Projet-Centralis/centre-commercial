@@ -1,0 +1,32 @@
+/* Ajoutez ceci dans votre styles.css global ou au début de votre fichier CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden; /* Évite le défilement horizontal */
+}
+
+.app-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #101324;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+}
+
+.page-content {
+  flex: 1;
+  padding: 20px;
+  background: #101324;
+}
