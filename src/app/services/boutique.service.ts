@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-
+import { AuthService } from '../../services/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,19 +9,18 @@ import { Observable } from 'rxjs';
 export class BoutiqueService {
 
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
   private apiUrl = 'http://localhost:5000/api/boutiques';
 
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ODM4N2ZmMjVkMDhkMmNiMDg4YWQwNyIsImVtYWlsIjoiaWZhbGlhbmFAdGVzdC5jb20iLCJ0eXBlX3VzZXIiOiJBRE1JTiIsImlhdCI6MTc3MDIyNzcxMSwiZXhwIjoxNzcwMzE0MTExfQ.HB2p5MpCzHu40yPPPFNlMfnjcdY1gXgOaybcuT5zfTk`
-    });
+    return this.authService.getAuthHeaders();
   }
 
   // GET ALL - Récupérer toutes les boutiques
   getAllBoutiques(): Observable<any> {
-    return this.http.get(this.apiUrl, { headers: this.getHeaders() });
+    return this.http.get(this.apiUrl, {
+      headers: this.getHeaders()
+    });
   }
 
   // ADD FAVORI - Ajouter une boutique aux favoris

@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BoutiqueService } from '../../services/boutique.service';
+import { AuthService } from '../../../services/auth.service';
 
 interface Boutique {
   _id: string;
@@ -14,10 +15,10 @@ interface Boutique {
     email: string;
     type_user: string;
   };
-  x?: number; // Position X en pourcentage (à définir manuellement ou aléatoirement)
-  y?: number; // Position Y en pourcentage (à définir manuellement ou aléatoirement)
-  color?: string; // Couleur pour l'affichage
-  icon?: string; // Icône pour l'affichage
+  x?: number;
+  y?: number;
+  color?: string;
+  icon?: string;
 }
 
 @Component({
@@ -28,8 +29,12 @@ interface Boutique {
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
+
   private boutiqueService = inject(BoutiqueService);
-  
+  private authService = inject(AuthService);
+
+  userName: string = '';
+
   searchTerm: string = '';
   selectedBoutique: Boutique | null = null;
   hoveredBoutique: Boutique | null = null;
@@ -37,10 +42,8 @@ export class HomeComponent implements OnInit {
   loading: boolean = true;
   error: string = '';
 
-  // Couleurs alternées pour les boutiques
   private colors = ['#32bcae', '#13514b'];
-  
-  // Icônes par défaut (vous pouvez améliorer la logique selon la catégorie)
+
   private icons = [
     'bi bi-bag',
     'bi bi-laptop',
@@ -51,48 +54,50 @@ export class HomeComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.loadUser();
     this.loadBoutiques();
+  }
+
+  private loadUser(): void {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      // Tu peux remplacer par user.name si tu l’as côté backend
+      this.userName = user.email.split('@')[0];
+    }
   }
 
   loadBoutiques(): void {
     this.loading = true;
     this.error = '';
-    
+
     this.boutiqueService.getAllBoutiques().subscribe({
       next: (response) => {
         if (response.success && response.data) {
-          // Transformer les données de l'API pour les adapter à l'interface
           this.boutiques = response.data.map((boutique: any, index: number) => ({
             ...boutique,
-            // Assigner des positions aléatoires ou prédéfinies
             x: this.getRandomPosition(20, 80),
             y: this.getRandomPosition(20, 80),
-            // Alterner les couleurs
             color: this.colors[index % this.colors.length],
-            // Assigner une icône
             icon: this.icons[index % this.icons.length]
           }));
-          this.loading = false;
         }
+        this.loading = false;
       },
-      error: (err) => {
-        console.error('Erreur lors du chargement des boutiques:', err);
+      error: () => {
         this.error = 'Impossible de charger les boutiques. Veuillez réessayer.';
         this.loading = false;
       }
     });
   }
 
-  // Générer une position aléatoire entre min et max
   private getRandomPosition(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   get filteredBoutiques(): Boutique[] {
-    if (!this.searchTerm) {
-      return this.boutiques;
-    }
-    return this.boutiques.filter(b => 
+    if (!this.searchTerm) return this.boutiques;
+
+    return this.boutiques.filter(b =>
       b.nom_boutique.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
       b.description.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
@@ -115,11 +120,11 @@ export class HomeComponent implements OnInit {
   }
 
   selectBoutique(boutique: Boutique): void {
-    this.selectedBoutique = this.selectedBoutique?._id === boutique._id ? null : boutique;
+    this.selectedBoutique =
+      this.selectedBoutique?._id === boutique._id ? null : boutique;
   }
 
   getTooltipX(x: number): number {
-    // Ajuster la position pour éviter que le tooltip sorte de l'écran
     return x > 70 ? x - 15 : x + 5;
   }
 

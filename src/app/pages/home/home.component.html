@@ -1,8 +1,9 @@
 <div class="home-container">
   <!-- Section Bienvenue -->
   <div class="welcome-section">
-    <h1>Bienvenue, Andry</h1>
-    <p>Découvrez les boutiques de notre centre commercial et trouvez ce que vous cherchez</p>
+    <h1>Bienvenue, {{ userName }}</h1>
+    <p>Découvrez les boutiques de notre centre commercial et trouvez ce que vous
+      cherchez</p>
   </div>
 
   <!-- Message de chargement -->
@@ -25,15 +26,16 @@
         <i class="bi bi-shop"></i>
         Nos Boutiques ({{ boutiques.length }})
       </h2>
-      
+
       <div class="search-box">
         <i class="bi bi-search"></i>
-        <input type="text" placeholder="Rechercher une boutique..." [(ngModel)]="searchTerm">
+        <input type="text" placeholder="Rechercher une boutique..."
+          [(ngModel)]="searchTerm">
       </div>
-      
+
       <div class="boutiques-scroll">
-        <div 
-          *ngFor="let boutique of filteredBoutiques; let i = index" 
+        <div
+          *ngFor="let boutique of filteredBoutiques; let i = index"
           class="boutique-card"
           [class.highlighted]="selectedBoutique?._id === boutique._id"
           [class.hovered]="hoveredBoutique?._id === boutique._id"
@@ -73,13 +75,13 @@
         </h2>
         <span class="map-info">Cliquez sur les points pour plus d'infos</span>
       </div>
-      
+
       <div class="map-wrapper">
         <img src="/map.png" alt="Plan du centre commercial" class="map-image">
-        
+
         <!-- Points sur la carte -->
-        <div 
-          *ngFor="let boutique of boutiques; let i = index" 
+        <div
+          *ngFor="let boutique of boutiques; let i = index"
           class="map-point"
           [class.active]="selectedBoutique?._id === boutique._id"
           [class.hovered]="hoveredBoutique?._id === boutique._id"
@@ -94,16 +96,19 @@
         </div>
 
         <!-- Tooltip au survol du point -->
-        <div 
-          *ngIf="hoveredBoutique" 
+        <div
+          *ngIf="hoveredBoutique"
           class="map-tooltip"
           [style.left.%]="getTooltipX(hoveredBoutique.x || 0)"
           [style.top.%]="hoveredBoutique.y">
-          <div class="tooltip-arrow" [style.border-top-color]="hoveredBoutique.color"></div>
+          <div class="tooltip-arrow"
+            [style.border-top-color]="hoveredBoutique.color"></div>
           <div class="tooltip-content">
-            <div class="tooltip-header" [style.background]="hoveredBoutique.color">
+            <div class="tooltip-header"
+              [style.background]="hoveredBoutique.color">
               <i [class]="hoveredBoutique.icon"></i>
-              <span class="tooltip-number">{{ getBoutiqueIndex(hoveredBoutique) }}</span>
+              <span class="tooltip-number">{{ getBoutiqueIndex(hoveredBoutique)
+                }}</span>
             </div>
             <div class="tooltip-body">
               <h4>{{ hoveredBoutique.nom_boutique }}</h4>
@@ -118,4 +123,4 @@
       </div>
     </div>
   </div>
-</div>    
+</div>
