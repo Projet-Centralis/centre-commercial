@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BoutiqueService } from '../../services/boutique.service';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from '../../services/auth.service';
 
 interface Boutique {
   _id: string;
