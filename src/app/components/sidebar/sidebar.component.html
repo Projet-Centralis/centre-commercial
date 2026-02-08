@@ -1,7 +1,69 @@
-<nav class="sidebar">
+<!-- <nav class="sidebar">
   <a routerLink="/accueil" routerLinkActive="active">Accueil</a>
   <a routerLink="/boutiques" routerLinkActive="active">Boutiques</a>
   <a routerLink="/promotions" routerLinkActive="active">Promotions</a>
   <a routerLink="/forums" routerLinkActive="active">Forums</a>
   <a routerLink="/events" routerLinkActive="active">Events</a>
+</nav> -->
+
+
+<nav class="sidebar">
+  <!-- Liens communs pour tous les utilisateurs -->
+  <!-- <a routerLink="/accueil" routerLinkActive="active">
+    <i class="bi bi-house"></i>
+    <span>Accueil</span>
+  </a> -->
+  
+  <!-- Liens spécifiques pour les BOUTIQUES -->
+  <ng-container *ngIf="isBoutique">
+    <a routerLink="/boutique-dashboard" routerLinkActive="active">
+      <i class="bi bi-house"></i>
+      <span>Dashboard</span>
+    </a>
+    <a routerLink="/boutique/events" routerLinkActive="active">
+      <i class="bi bi-calendar-event"></i>
+      <span>Events</span>
+    </a>
+    <a routerLink="/boutique/clients" routerLinkActive="active">
+      <i class="bi bi-people"></i>
+      <span>Clients</span>
+    </a>
+    <a routerLink="/boutique/produits" routerLinkActive="active">
+      <i class="bi bi-box-seam"></i>
+      <span>Produits</span>
+    </a>
+    <a routerLink="/boutique/prevision" routerLinkActive="active">
+      <i class="bi bi-graph-up"></i>
+      <span>Prévision</span>
+    </a>
+    <a routerLink="/boutique/loyers" routerLinkActive="active">
+      <i class="bi bi-cash-coin"></i>
+      <span>Loyers</span>
+    </a>
+  </ng-container>
+
+  <!-- Liens pour les ACHETEURS -->
+
+  <ng-container *ngIf="!isBoutique">
+    <a routerLink="/accueil" routerLinkActive="active">
+    <i class="bi bi-house"></i>
+    <span>Accueil</span>
+  </a>
+    <a routerLink="/boutiques" routerLinkActive="active">
+      <i class="bi bi-shop"></i>
+      <span>Boutiques</span>
+    </a>
+    <a routerLink="/promotions" routerLinkActive="active">
+      <i class="bi bi-percent"></i>
+      <span>Promotions</span>
+    </a>
+    <a routerLink="/forums" routerLinkActive="active">
+      <i class="bi bi-chat-dots"></i>
+      <span>Forums</span>
+    </a>
+    <a routerLink="/events" routerLinkActive="active">
+      <i class="bi bi-calendar-event"></i>
+      <span>Events</span>
+    </a>
+  </ng-container>
 </nav>

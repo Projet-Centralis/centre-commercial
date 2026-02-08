@@ -1,0 +1,46 @@
+<div class="auth-container">
+  <div [class]="getCardClass()">
+    <div class="auth-header">
+      <h1>
+       <img src="/logo.png" alt="Logo" class="logo">
+      </h1>
+      <p class="auth-subtitle">Accédez à votre espace personnel</p>
+    </div>
+
+    <div class="mode-toggle">
+      <button 
+        class="mode-btn" 
+        [class.active]="isLoginMode"
+        (click)="isLoginMode = true">
+        <i class="bi bi-box-arrow-in-right"></i>
+        Connexion
+      </button>
+      <button 
+        class="mode-btn" 
+        [class.active]="!isLoginMode"
+        (click)="isLoginMode = false">
+        <i class="bi bi-person-plus"></i>
+        Inscription
+      </button>
+    </div>
+
+    <div class="auth-content">
+      <app-login *ngIf="isLoginMode"></app-login>
+      <app-signin *ngIf="!isLoginMode"></app-signin>
+    </div>
+
+    <div class="auth-footer">
+      <p>
+        {{ isLoginMode ? 'Nouveau chez nous ?' : 'Déjà un compte ?' }}
+        <button class="switch-link" (click)="toggleMode()">
+          {{ isLoginMode ? 'Créer un compte' : 'Se connecter' }}
+        </button>
+      </p>
+    </div>
+  </div>
+
+  <div class="auth-decoration">
+    <div class="decoration-circle" style="background: #32bcae;"></div>
+    <div class="decoration-circle" style="background: #13514b;"></div>
+  </div>
+</div>

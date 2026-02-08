@@ -1,4 +1,4 @@
-.sidebar {
+/* .sidebar {
   width: 200px;
   height: 100%;
   background: #101324;
@@ -32,4 +32,65 @@
   background: linear-gradient(90deg, #13514b 0%, rgba(19, 81, 75, 0.3) 100%);
   border-left-color: #32bcae;
   box-shadow: 0 0 10px rgba(50, 188, 174, 0.3);
+} */
+
+.sidebar {
+  width: 240px;
+  height: 100%;
+  background: #101324;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  border-right: 2px solid #13514b;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sidebar a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  padding: 14px 25px;
+  margin: 2px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 8px;
+}
+
+.sidebar a:hover {
+  background: rgba(19, 81, 75, 0.3);
+  color: #ffffff;
+  border-left-color: #32bcae;
+  transform: translateX(5px);
+}
+
+.sidebar a.active {
+  background: linear-gradient(90deg, rgba(19, 81, 75, 0.4) 0%, rgba(50, 188, 174, 0.1) 100%);
+  color: #32bcae;
+  border-left-color: #32bcae;
+  box-shadow: 0 0 15px rgba(50, 188, 174, 0.2);
+}
+
+.sidebar a i {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.sidebar a span {
+  flex: 1;
+}
+
+/* Badge pour indicateur */
+.sidebar a .badge {
+  background: #32bcae;
+  color: #101324;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
 }

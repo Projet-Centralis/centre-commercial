@@ -1,0 +1,174 @@
+<form class="signin-form" (ngSubmit)="onSubmit()">
+  <div class="form-group">
+    <label for="signin-email">
+      <i class="bi bi-envelope"></i>
+      Adresse email
+    </label>
+    <div class="input-wrapper">
+      <input 
+        type="email" 
+        id="signin-email"
+        [(ngModel)]="email"
+        name="email"
+        placeholder="votre@email.com"
+        required>
+      <i class="bi bi-check-circle-fill valid-icon" *ngIf="email && email.includes('@')"></i>
+    </div>
+  </div>
+
+  <div class="password-row">
+    <div class="form-group">
+      <label for="signin-password">
+        <i class="bi bi-key"></i>
+        Mot de passe
+      </label>
+      <div class="input-wrapper">
+        <input 
+          [type]="passwordFieldType"
+          id="signin-password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Min. 6 caractères"
+          required
+          minlength="6">
+        <button 
+          type="button"
+          class="password-toggle"
+          (click)="togglePasswordVisibility()">
+          <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+        </button>
+      </div>
+      <div class="password-strength" *ngIf="password">
+        <div class="strength-bar" [class]="getStrengthClass()"></div>
+        <span class="strength-text">{{ getStrengthText() }}</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="confirm-password">
+        <i class="bi bi-key-fill"></i>
+        Confirmation
+      </label>
+      <div class="input-wrapper">
+        <input 
+          [type]="confirmPasswordFieldType"
+          id="confirm-password"
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          placeholder="Retapez le mot de passe"
+          required>
+        <button 
+          type="button"
+          class="password-toggle"
+          (click)="toggleConfirmPasswordVisibility()">
+          <i [class]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+        </button>
+      </div>
+      <div class="validation-message" *ngIf="confirmPassword">
+        <i [class]="passwordsMatch ? 'bi bi-check-circle-fill success' : 'bi bi-x-circle-fill error'"></i>
+        <span [class]="passwordsMatch ? 'success' : 'error'">
+          {{ passwordsMatch ? 'Correspond' : 'Ne correspond pas' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="form-group">
+    <label>
+      <i class="bi bi-person-badge"></i>
+      Type d'utilisateur
+    </label>
+    
+    <div class="user-type-options">
+      <div 
+        *ngFor="let type of userTypes"
+        class="user-type-card"
+        [class.selected]="userType === type.value"
+        (click)="userType = type.value">
+        <div class="type-icon" [style.background]="userType === type.value ? '#32bcae' : '#13514b'">
+          <i [class]="type.icon"></i>
+        </div>
+        <div class="type-info">
+          <h4>{{ type.label }}</h4>
+          <p>{{ type.description }}</p>
+        </div>
+        <div class="type-check">
+          <i class="bi bi-check-circle-fill" *ngIf="userType === type.value"></i>
+        </div>
+      </div>
+    </div> -->
+    <!-- User Type Selection -->
+  <div class="form-group">
+    <label>
+      <i class="bi bi-person-badge"></i>
+      Type d'utilisateur
+    </label>
+    
+    <div class="user-type-options">
+      <div 
+        *ngFor="let type of userTypes"
+        class="user-type-card"
+        [class.selected]="userType === type.value"
+        (click)="userType = type.value">
+        <div class="type-icon" [style.background]="userType === type.value ? '#32bcae' : '#13514b'">
+          <i [class]="type.icon"></i>
+        </div>
+        <div class="type-info">
+          <h4>{{ type.label }}</h4>
+          <p>{{ type.description }}</p>
+        </div>
+        <div class="type-check">
+          <i class="bi bi-check-circle-fill" *ngIf="userType === type.value"></i>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Hidden select for form submission -->
+    <select [(ngModel)]="userType" name="userType" style="display: none;" required>
+      <option value="" disabled>Choisir un type</option>
+      <option *ngFor="let type of userTypes" [value]="type.value">{{ type.label }}</option>
+    </select>
+
+    
+    <select [(ngModel)]="userType" name="userType" style="display: none;" required>
+      <option value="" disabled selected>Choisir un type</option>
+      <option *ngFor="let type of userTypes" [value]="type.value">{{ type.label }}</option>
+    </select>
+  </div>
+
+  <div class="terms-section">
+    <label class="checkbox-label">
+      <input type="checkbox" [(ngModel)]="acceptTerms" name="acceptTerms" required>
+      <span class="checkmark"></span>
+      <span class="terms-text">
+        J'accepte les 
+        <button type="button" class="terms-link">conditions d'utilisation</button>
+        et la 
+        <button type="button" class="terms-link">politique de confidentialité</button>
+      </span>
+    </label>
+  </div>
+
+  <button 
+    type="submit" 
+    class="submit-btn"
+    [disabled]="!isFormValid || isLoading">
+    <span *ngIf="!isLoading">
+      <i class="bi bi-person-plus"></i>
+      Créer mon compte
+    </span>
+    <span *ngIf="isLoading">
+      <i class="bi bi-arrow-clockwise spin"></i>
+      Création en cours...
+    </span>
+  </button>
+
+  <div class="signin-info">
+    <i class="bi bi-info-circle"></i>
+    <p>Votre compte sera activé après vérification de votre email.</p>
+  </div>
+  <div class="error-message" *ngIf="errorMessage">
+  <i class="bi bi-exclamation-circle"></i>
+  {{ errorMessage }}
+</div>
+</form>
