@@ -1,0 +1,325 @@
+<div class="events-container">
+  <!-- Header -->
+  <div class="events-header">
+    <div class="header-left">
+      <h1>
+        <i class="bi bi-calendar-event"></i>
+        Gestion des Événements
+      </h1>
+      <p class="subtitle">Créez et gérez les événements de votre boutique</p>
+    </div>
+    <div class="header-right">
+      <button class="create-btn" (click)="openCreateModal()">
+        <i class="bi bi-plus-circle"></i>
+        Nouvel événement
+      </button>
+    </div>
+  </div>
+
+ <!-- Statistiques -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon total">
+      <i class="bi bi-calendar3"></i>
+    </div>
+    <div class="stat-content">
+      <h3>Total événements</h3>
+      <div class="stat-value">{{ events.length }}</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon pending">
+      <i class="bi bi-clock-history"></i>
+    </div>
+    <div class="stat-content">
+      <h3>En attente</h3>
+      <div class="stat-value">{{ getPendingEventsCount() }}</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon valid">
+      <i class="bi bi-check-circle"></i>
+    </div>
+    <div class="stat-content">
+      <h3>Validés</h3>
+      <div class="stat-value">{{ getValidEventsCount() }}</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon participants">
+      <i class="bi bi-people"></i>
+    </div>
+    <div class="stat-content">
+      <h3>Participants totaux</h3>
+      <div class="stat-value">{{ getTotalParticipants() }}</div>
+    </div>
+  </div>
+</div>
+
+  <!-- Filtres et recherche -->
+  <div class="filters-section">
+    <div class="search-bar">
+      <i class="bi bi-search"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="onSearch()"
+        placeholder="Rechercher un événement...">
+      <button *ngIf="searchTerm" (click)="clearSearch()" class="clear-btn">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    
+    <div class="filter-controls">
+      <div class="filter-group">
+        <label for="statusFilter">
+          <i class="bi bi-funnel"></i>
+          Statut
+        </label>
+        <select 
+          id="statusFilter" 
+          [(ngModel)]="statusFilter" 
+          (change)="applyFilters()"
+          class="filter-select">
+          <option value="all">Tous les statuts</option>
+          <option value="en attente">En attente</option>
+          <option value="valide">Validés</option>
+          <option value="rejete">Rejetés</option>
+          <option value="termine">Terminés</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="sortBy">
+          <i class="bi bi-sort-down"></i>
+          Trier par
+        </label>
+        <select 
+          id="sortBy" 
+          [(ngModel)]="sortBy" 
+          (change)="applyFilters()"
+          class="filter-select">
+          <option value="date">Date (récent)</option>
+          <option value="titre">Titre (A-Z)</option>
+          <option value="statut">Statut</option>
+          <option value="participants">Participants</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <!-- Message de succès -->
+<div *ngIf="successMessage" class="success-message">
+  <i class="bi bi-check-circle"></i>
+  {{ successMessage }}
+</div>
+
+  <!-- Contenu principal -->
+  <div class="events-content">
+    <!-- Loading state -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loader"></div>
+      <p>Chargement des événements...</p>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="errorMessage && !loading" class="error-state">
+      <i class="bi bi-exclamation-triangle"></i>
+      <p>{{ errorMessage }}</p>
+      <button (click)="loadEvents()" class="retry-btn">
+        <i class="bi bi-arrow-clockwise"></i>
+        Réessayer
+      </button>
+    </div>
+
+    <!-- Empty state -->
+    <!-- Lignes ~158-165 (si vous avez d'autres calculs complexes) -->
+<div class="empty-state" *ngIf="!loading && !errorMessage && filteredEvents.length === 0">
+  <i class="bi bi-calendar-x"></i>
+  <p>Aucun événement trouvé</p>
+  <button (click)="openCreateModal()" class="create-btn-empty">
+    <i class="bi bi-plus-circle"></i>
+    Créer votre premier événement
+  </button>
+</div>
+
+    <!-- Liste des événements -->
+    <div *ngIf="!loading && filteredEvents.length > 0" class="events-grid">
+      <div *ngFor="let event of filteredEvents" class="event-card" [class]="event.statut">
+        <div class="event-header">
+          <div class="event-status" [style.background]="getStatusColor(event.statut)">
+            {{ getStatusText(event.statut) }}
+          </div>
+          <div class="event-actions">
+            <button class="action-btn edit" (click)="openEditModal(event)" title="Modifier">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="action-btn delete" (click)="deleteEvent(event)" title="Supprimer">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="event-body">
+          <h3 class="event-title">{{ event.titre }}</h3>
+          <p class="event-description">{{ event.description }}</p>
+          
+          <div class="event-dates">
+            <div class="date-item">
+              <i class="bi bi-calendar-check"></i>
+              <span>Début: {{ formatDisplayDate(event.date_debut) }}</span>
+            </div>
+            <div class="date-item">
+              <i class="bi bi-calendar-x"></i>
+              <span>Fin: {{ formatDisplayDate(event.date_fin) }}</span>
+            </div>
+          </div>
+          
+          <div class="event-countdown">
+            <i class="bi bi-clock"></i>
+            <span>{{ getTimeRemaining(event.date_fin) }}</span>
+          </div>
+        </div>
+        
+        <div class="event-footer">
+          <div class="event-participants">
+            <div class="participants-header">
+              <i class="bi bi-people"></i>
+              <span>Participants</span>
+            </div>
+            <div class="participants-count">
+              {{ event.participants || 0 }} / {{ event.capacite_max }}
+            </div>
+            <div class="progress-bar">
+              <div 
+                class="progress-fill" 
+                [style.width.%]="getProgressPercentage(event)"
+                [style.background]="getProgressColor(event)">
+              </div>
+            </div>
+          </div>
+          
+          <div class="event-created">
+            <i class="bi bi-calendar-plus"></i>
+            <span>Créé le {{ formatDisplayDate(event.createdAt || '') }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de création/édition -->
+  <div *ngIf="showEventModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="bi bi-calendar-plus"></i>
+          {{ isEditing ? 'Modifier l\'événement' : 'Nouvel événement' }}
+        </h2>
+        <button class="modal-close" (click)="closeModal()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      
+      <form (ngSubmit)="submitEvent()" class="event-form">
+        <div class="form-group">
+          <label for="eventTitle">
+            <i class="bi bi-card-heading"></i>
+            Titre de l'événement *
+          </label>
+          <input 
+            type="text" 
+            id="eventTitle"
+            [(ngModel)]="eventForm.titre"
+            name="titre"
+            placeholder="Ex: Lancement de la nouvelle collection"
+            required>
+        </div>
+        
+        <div class="form-group">
+          <label for="eventDescription">
+            <i class="bi bi-text-paragraph"></i>
+            Description *
+          </label>
+          <textarea 
+            id="eventDescription"
+            [(ngModel)]="eventForm.description"
+            name="description"
+            rows="4"
+            placeholder="Décrivez votre événement en détail..."
+            required></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eventStartDate">
+              <i class="bi bi-calendar-check"></i>
+              Date et heure de début *
+            </label>
+            <input 
+              type="datetime-local" 
+              id="eventStartDate"
+              [(ngModel)]="eventForm.date_debut"
+              name="date_debut"
+              required>
+          </div>
+          
+          <div class="form-group">
+            <label for="eventEndDate">
+              <i class="bi bi-calendar-x"></i>
+              Date et heure de fin *
+            </label>
+            <input 
+              type="datetime-local" 
+              id="eventEndDate"
+              [(ngModel)]="eventForm.date_fin"
+              name="date_fin"
+              required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="eventCapacity">
+            <i class="bi bi-people"></i>
+            Capacité maximale *
+          </label>
+          <div class="capacity-input">
+            <input 
+              type="number" 
+              id="eventCapacity"
+              [(ngModel)]="eventForm.capacite_max"
+              name="capacite_max"
+              min="1"
+              max="1000"
+              required>
+            <span class="capacity-unit">personnes</span>
+          </div>
+        </div>
+        
+        <div *ngIf="errorMessage" class="form-error">
+          <i class="bi bi-exclamation-circle"></i>
+          {{ errorMessage }}
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeModal()">
+            Annuler
+          </button>
+          <!-- Ligne ~309-313 -->
+            <button type="submit" class="submit-btn" [disabled]="loading">
+            <span *ngIf="!loading">
+                <i class="bi" [class.bi-check-circle]="!isEditing" [class.bi-pencil]="isEditing"></i>
+                {{ isEditing ? 'Mettre à jour' : 'Créer l\'événement' }}
+            </span>
+            <span *ngIf="loading">
+                <i class="bi bi-arrow-clockwise spin"></i>
+                {{ isEditing ? 'Mise à jour...' : 'Création...' }}
+            </span>
+            </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
