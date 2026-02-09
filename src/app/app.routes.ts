@@ -136,6 +136,10 @@ export const routes: Routes = [
             path: 'dashboard', 
             loadComponent: () => import('./pages/boutique-dashboard/boutique-dashboard.component').then(m => m.BoutiqueDashboardComponent) 
           },
+          {
+            path: 'events', 
+            loadComponent: () => import('./pages/boutique-events/boutique-events.component').then(m => m.BoutiqueEventsComponent) 
+          },
           // ... autres routes boutique
           { 
             path: '', 
