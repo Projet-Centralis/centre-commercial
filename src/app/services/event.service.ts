@@ -69,10 +69,12 @@
 // }
 
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient,HttpHeaders  } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
+
 
 export interface Event {
   _id: string;
@@ -116,11 +118,15 @@ export interface ApiResponse<T> {
 })
 export class EventService {
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
   private apiUrl = `${environment.apiUrl}/events`;
 
   // Récupérer tous les événements (pour les acheteurs)
   getAllEvents(): Observable<Event[]> {
     return this.http.get<Event[]>(this.apiUrl);
+  }
+  private getHeaders(): HttpHeaders {
+    return this.authService.getAuthHeaders();
   }
 
   // Récupérer les événements d'une boutique
@@ -188,6 +194,32 @@ export class EventService {
           message: error.error?.message || 'Erreur lors de la validation'
         });
       })
+    );
+  }
+  // Récupérer tous les événements valides
+  getEventsValide(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/events_valide`, {
+      headers: this.getHeaders()
+    });
+  }
+  // Récupérer les événements de l'utilisateur
+  getMyEvents(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/my-events`, {
+      headers: this.getHeaders()
+    });
+  }
+   // Récupérer les événements de l'utilisateur
+  getcapaciterestante(id: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}/capacite-restante`, {
+      headers: this.getHeaders()
+    });
+  }
+  // Participer à un événement
+  registerToEvent(eventId: string): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/${eventId}/register`,
+      {},
+      { headers: this.getHeaders() }
     );
   }
 }

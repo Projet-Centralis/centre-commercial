@@ -1,1 +1,149 @@
-<p>events works!</p>
+<div class="events-container">
+  <!-- Messages -->
+  <div class="messages" *ngIf="successMessage || errorMessage">
+    <div class="message success" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+    <div class="message error" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Section des événements disponibles -->
+  <section class="events-section">
+    <h2 class="section-title">Événements Disponibles</h2>
+    
+    <div class="loading" *ngIf="isLoadingAvailable">
+      <div class="spinner"></div>
+      <p>Chargement des événements...</p>
+    </div>
+
+    <div class="events-grid" *ngIf="!isLoadingAvailable">
+      <div class="event-card" *ngFor="let event of availableEvents">
+        <div class="event-header">
+          <h3 class="event-title">{{ event.titre }}</h3>
+          <span class="event-status" [class.status-valide]="event.statut === 'valide'">
+            {{ getStatusLabel(event.statut) }}
+          </span>
+        </div>
+
+        <p class="event-description">{{ event.description }}</p>
+
+        <div class="event-details">
+          <div class="detail-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>{{ formatDate(event.date_debut) }}</span>
+          </div>
+
+          <div class="detail-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>{{ formatTime(event.date_debut) }} - {{ formatTime(event.date_fin) }}</span>
+          </div>
+
+          <div class="detail-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span *ngIf="!event.isLoadingCapacity">
+              {{ event.capacite_restante || 0 }} / {{ event.capacite_max }} places
+            </span>
+            <span *ngIf="event.isLoadingCapacity" class="loading-text">Chargement...</span>
+          </div>
+
+          <div class="detail-item" *ngIf="event.boutique">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+            <span>{{ event.boutique.nom_boutique }}</span>
+          </div>
+        </div>
+
+        <button 
+          class="btn-register"
+          [class.btn-disabled]="isEventFull(event) || isEventPast(event)"
+          [disabled]="isEventFull(event) || isEventPast(event)"
+          (click)="registerToEvent(event._id)">
+          <span *ngIf="!isEventFull(event) && !isEventPast(event)">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="20" y1="8" x2="20" y2="14"></line>
+              <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+            Participer
+          </span>
+          <span *ngIf="isEventFull(event)">Complet</span>
+          <span *ngIf="!isEventFull(event) && isEventPast(event)">Terminé</span>
+        </button>
+      </div>
+
+      <div class="no-events" *ngIf="availableEvents.length === 0">
+        <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <p>Aucun événement disponible pour le moment</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section mes événements -->
+  <section class="events-section my-events-section">
+    <h2 class="section-title">Mes Inscriptions</h2>
+
+    <div class="loading" *ngIf="isLoadingMy">
+      <div class="spinner"></div>
+      <p>Chargement...</p>
+    </div>
+
+    <div class="my-events-list" *ngIf="!isLoadingMy">
+      <div class="my-event-item" *ngFor="let event of myEvents">
+        <div class="my-event-content">
+          <div class="my-event-info">
+            <h4>{{ event.titre }}</h4>
+            <p class="my-event-date">
+              <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              {{ formatDate(event.date_debut) }} à {{ formatTime(event.date_debut) }}
+            </p>
+          </div>
+          
+          <div class="my-event-capacity">
+            <span class="capacity-label">Places restantes</span>
+            <span class="capacity-value" *ngIf="!event.isLoadingCapacity">
+              {{ event.capacite_restante || 0 }}
+            </span>
+            <span class="capacity-value loading-text" *ngIf="event.isLoadingCapacity">...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-events" *ngIf="myEvents.length === 0">
+        <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="8.5" cy="7" r="4"></circle>
+          <line x1="20" y1="8" x2="20" y2="14"></line>
+          <line x1="23" y1="11" x2="17" y2="11"></line>
+        </svg>
+        <p>Vous n'êtes inscrit à aucun événement</p>
+      </div>
+    </div>
+  </section>
+</div>
