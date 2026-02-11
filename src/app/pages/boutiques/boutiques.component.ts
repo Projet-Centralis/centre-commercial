@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BoutiqueService } from '../../services/boutique.service';
-import { ProduitService } from '../../services/produit.service';
+import { ProduitService,ApiResponse,Produit } from '../../services/produit.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -18,11 +18,14 @@ export class BoutiquesComponent implements OnInit {
   produits: any[] = [];
   selectedBoutiqueId: string | null = null;
   selectedBoutique: any = null;
+   loading = false;
+  errorMessage = '';
+  successMessage = '';
 
   searchTerm: string = '';
   showOnlyFavoris: boolean = false;
 
-  loading = false;
+
   loadingProduits = false;
   error: string | null = null;
 
@@ -109,24 +112,32 @@ export class BoutiquesComponent implements OnInit {
   selectBoutique(boutique: any): void {
     this.selectedBoutiqueId = boutique._id;
     this.selectedBoutique = boutique;
-    this.loadProduits(boutique._id);
+    this.loadProduits();
   }
 
-  loadProduits(boutiqueId: string): void {
-    this.loadingProduits = true;
-    this.produits = [];
-
-    this.produitService.getProductsBoutique(boutiqueId).subscribe({
-      next: (response) => {
-        this.produits = response.data || response;
-        this.loadingProduits = false;
-      },
-      error: (err) => {
-        console.error('Erreur lors du chargement des produits:', err);
-        this.loadingProduits = false;
-      }
-    });
-  }
+ loadProduits(): void {
+     this.loading = true;
+     this.errorMessage = '';
+     this.successMessage = '';
+     
+     this.produitService.getProduitsBoutique().subscribe({
+       next: (response: ApiResponse<Produit[]>) => {
+         if (response.success && response.data) {
+           this.produits = response.data;
+          //  this.applyFilters();
+         } else {
+           this.errorMessage = response.message || 'Erreur lors du chargement';
+         }
+         this.loading = false;
+       },
+       error: (error) => {
+         this.errorMessage = 'Erreur de connexion au serveur';
+         console.error('Détails erreur:', error);
+         this.loading = false;
+       }
+     });
+   }
+  
 
   isFavori(boutiqueId: string): boolean {
     return this.favorisIds.has(boutiqueId);

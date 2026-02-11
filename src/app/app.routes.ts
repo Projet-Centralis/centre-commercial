@@ -140,6 +140,10 @@ export const routes: Routes = [
             path: 'events', 
             loadComponent: () => import('./pages/boutique-events/boutique-events.component').then(m => m.BoutiqueEventsComponent) 
           },
+          {
+            path: 'produits', 
+            loadComponent: () => import('./pages/boutique-produits/boutique-produits.component').then(m => m.BoutiqueProduitsComponent) 
+          },
           // ... autres routes boutique
           { 
             path: '', 

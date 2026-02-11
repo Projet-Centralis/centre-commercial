@@ -1,0 +1,473 @@
+<div class="events-container">
+  <!-- Header -->
+  <div class="events-header">
+    <div class="header-left">
+      <h1>
+        <i class="bi bi-box-seam"></i>
+        Gestion des Produits
+      </h1>
+      <p class="subtitle">Gérez votre catalogue de produits et vos stocks</p>
+    </div>
+    <div class="header-right">
+      <button class="create-btn" (click)="openCreateModal()">
+        <i class="bi bi-plus-circle"></i>
+        Nouveau produit
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <i class="bi bi-boxes"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Total produits</h3>
+        <div class="stat-value">{{ getTotalProduits() }}</div>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon valid">
+        <i class="bi bi-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Produits actifs</h3>
+        <div class="stat-value">{{ getActifsCount() }}</div>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon pending">
+        <i class="bi bi-exclamation-triangle"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Alertes stock</h3>
+        <div class="stat-value">{{ getAlertesCount() }}</div>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon participants">
+        <i class="bi bi-x-circle"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Ruptures</h3>
+        <div class="stat-value">{{ getRupturesCount() }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et recherche -->
+  <div class="filters-section">
+    <div class="search-bar">
+      <i class="bi bi-search"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="onSearch()"
+        placeholder="Rechercher un produit...">
+      <button *ngIf="searchTerm" (click)="clearSearch()" class="clear-btn">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    
+    <div class="filter-controls">
+      <div class="filter-group">
+        <label for="categorieFilter">
+          <i class="bi bi-tags"></i>
+          Catégorie
+        </label>
+        <select 
+          id="categorieFilter" 
+          [(ngModel)]="categorieFilter" 
+          (change)="applyFilters()"
+          class="filter-select">
+          <option value="all">Toutes catégories</option>
+          <option *ngFor="let cat of categories" [value]="cat._id">
+            {{ cat.nom }}
+          </option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="statusFilter">
+          <i class="bi bi-funnel"></i>
+          Statut
+        </label>
+        <select 
+          id="statusFilter" 
+          [(ngModel)]="statusFilter" 
+          (change)="applyFilters()"
+          class="filter-select">
+          <option value="all">Tous les statuts</option>
+          <option value="actif">Actifs</option>
+          <option value="inactif">Inactifs</option>
+          <option value="alerte">Alertes stock</option>
+          <option value="rupture">Ruptures</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="sortBy">
+          <i class="bi bi-sort-down"></i>
+          Trier par
+        </label>
+        <select 
+          id="sortBy" 
+          [(ngModel)]="sortBy" 
+          (change)="applyFilters()"
+          class="filter-select">
+          <option value="date">Date (récent)</option>
+          <option value="nom">Nom (A-Z)</option>
+          <option value="prix">Prix (élevé)</option>
+          <option value="stock">Stock (élevé)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message de succès -->
+  <div *ngIf="successMessage" class="success-message">
+    <i class="bi bi-check-circle"></i>
+    {{ successMessage }}
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="events-content">
+    <!-- Loading state -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loader"></div>
+      <p>Chargement des produits...</p>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="errorMessage && !loading" class="error-state">
+      <i class="bi bi-exclamation-triangle"></i>
+      <p>{{ errorMessage }}</p>
+      <button (click)="loadProduits()" class="retry-btn">
+        <i class="bi bi-arrow-clockwise"></i>
+        Réessayer
+      </button>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && !errorMessage && filteredProduits.length === 0" class="empty-state">
+      <i class="bi bi-box"></i>
+      <p>Aucun produit trouvé</p>
+      <button (click)="openCreateModal()" class="create-btn-empty">
+        <i class="bi bi-plus-circle"></i>
+        Créer votre premier produit
+      </button>
+    </div>
+
+    <!-- Liste des produits -->
+    <div *ngIf="!loading && filteredProduits.length > 0" class="events-grid">
+      <div *ngFor="let produit of filteredProduits" class="event-card">
+        <div class="event-header">
+          <div class="event-status" [style.background]="getStockStatusColor(produit)">
+            {{ getStockStatusText(produit) }}
+          </div>
+          <div class="event-actions">
+            <button class="action-btn edit" (click)="openEditModal(produit)" title="Modifier">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="action-btn" [class]="produit.est_actif ? 'delete' : 'edit'" 
+                    (click)="toggleProduitStatus(produit)" 
+                    [title]="produit.est_actif ? 'Désactiver' : 'Activer'">
+              <i class="bi" [class.bi-toggle-off]="!produit.est_actif" [class.bi-toggle-on]="produit.est_actif"></i>
+            </button>
+            <button class="action-btn delete" (click)="deleteProduit(produit)" title="Supprimer">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="event-body">
+          <div class="product-image">
+            <img [src]="getProduitImage(produit.images)" [alt]="produit.nom_produit">
+          </div>
+          
+          <h3 class="event-title">{{ produit.nom_produit }}</h3>
+          <p class="event-description">{{ produit.description }}</p>
+          
+          <div class="event-dates">
+            <div class="date-item">
+              <i class="bi bi-tag"></i>
+              <span>Catégorie: {{ getCategorieNom(produit.categorie) }}</span>
+            </div>
+            <div class="date-item">
+              <i class="bi bi-currency-euro"></i>
+              <span>
+                Prix: 
+                <span *ngIf="produit.prix_promotionnel" class="old-price">
+                  {{ formatPrice(produit.prix) }}
+                </span>
+                {{ formatPrice(produit.prix_promotionnel || produit.prix) }}
+                <span *ngIf="produit.prix_promotionnel" class="discount">
+                  -{{ getReduction(produit) }}%
+                </span>
+              </span>
+            </div>
+            <div class="date-item">
+              <i class="bi bi-box"></i>
+              <span>Stock: {{ produit.quantite_stock }} unités</span>
+            </div>
+            <div class="date-item">
+              <i class="bi bi-bell"></i>
+              <span>Seuil alerte: {{ produit.seuil_alerte_stock }} unités</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="event-footer">
+          <button class="stock-btn" (click)="openStockModal(produit)">
+            <i class="bi bi-plus-slash-minus"></i>
+            Gérer le stock
+          </button>
+          
+          <div class="event-created">
+            <i class="bi bi-calendar-plus"></i>
+            <span>Créé le {{ formatDate(produit.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de création/édition produit -->
+  <div *ngIf="showProduitModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="bi bi-box-seam"></i>
+          {{ isEditing ? 'Modifier le produit' : 'Nouveau produit' }}
+        </h2>
+        <button class="modal-close" (click)="closeProduitModal()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      
+      <form (ngSubmit)="submitProduit()" class="event-form">
+        <div class="form-group">
+          <label for="produitNom">
+            <i class="bi bi-card-heading"></i>
+            Nom du produit *
+          </label>
+          <input 
+            type="text" 
+            id="produitNom"
+            [(ngModel)]="produitForm.nom_produit"
+            name="nom_produit"
+            placeholder="Ex: T-shirt en coton bio"
+            required>
+        </div>
+        
+        <div class="form-group">
+          <label for="produitDescription">
+            <i class="bi bi-text-paragraph"></i>
+            Description *
+          </label>
+          <textarea 
+            id="produitDescription"
+            [(ngModel)]="produitForm.description"
+            name="description"
+            rows="4"
+            placeholder="Décrivez votre produit en détail..."
+            required></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="produitCategorie">
+              <i class="bi bi-tags"></i>
+              Catégorie *
+            </label>
+            <select 
+              id="produitCategorie"
+              [(ngModel)]="produitForm.categorie"
+              name="categorie"
+              required
+              class="filter-select">
+              <option value="">Sélectionnez une catégorie</option>
+              <option *ngFor="let cat of categories" [value]="cat._id">
+                {{ cat.nom }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="produitPrix">
+              <i class="bi bi-currency-euro"></i>
+              Prix (€) *
+            </label>
+            <input 
+              type="number" 
+              id="produitPrix"
+              [(ngModel)]="produitForm.prix"
+              name="prix"
+              min="0"
+              step="0.01"
+              required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="produitPrixPromo">
+              <i class="bi bi-percent"></i>
+              Prix promotionnel
+            </label>
+            <input 
+              type="number" 
+              id="produitPrixPromo"
+              [(ngModel)]="produitForm.prix_promotionnel"
+              name="prix_promotionnel"
+              min="0"
+              step="0.01">
+          </div>
+          
+          <div class="form-group">
+            <label for="produitStock">
+              <i class="bi bi-box"></i>
+              Quantité initiale *
+            </label>
+            <input 
+              type="number" 
+              id="produitStock"
+              [(ngModel)]="produitForm.quantite_stock"
+              name="quantite_stock"
+              min="0"
+              required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="produitSeuil">
+            <i class="bi bi-bell"></i>
+            Seuil d'alerte stock *
+          </label>
+          <input 
+            type="number" 
+            id="produitSeuil"
+            [(ngModel)]="produitForm.seuil_alerte_stock"
+            name="seuil_alerte_stock"
+            min="1"
+            value="10"
+            required>
+        </div>
+        
+        <div *ngIf="errorMessage" class="form-error">
+          <i class="bi bi-exclamation-circle"></i>
+          {{ errorMessage }}
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeProduitModal()">
+            Annuler
+          </button>
+          <button type="submit" class="submit-btn" [disabled]="loading">
+            <span *ngIf="!loading">
+              <i class="bi" [class.bi-check-circle]="!isEditing" [class.bi-pencil]="isEditing"></i>
+              {{ isEditing ? 'Mettre à jour' : 'Créer le produit' }}
+            </span>
+            <span *ngIf="loading">
+              <i class="bi bi-arrow-clockwise spin"></i>
+              {{ isEditing ? 'Mise à jour...' : 'Création...' }}
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de gestion stock -->
+  <div *ngIf="showStockModal && currentProduitStock" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="bi bi-plus-slash-minus"></i>
+          Gestion du stock
+        </h2>
+        <button class="modal-close" (click)="closeStockModal()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      
+      <div class="event-form">
+        <div class="form-group">
+          <h3 style="color: #fff; margin-bottom: 10px;">
+            Produit: {{ currentProduitStock.nom_produit }}
+          </h3>
+          <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">
+            Stock actuel: {{ currentProduitStock.quantite_stock }} unités
+          </p>
+        </div>
+        
+        <div class="form-group">
+          <label for="stockOperation">
+            <i class="bi bi-arrow-left-right"></i>
+            Opération *
+          </label>
+          <select 
+            id="stockOperation"
+            [(ngModel)]="stockForm.operation"
+            class="filter-select">
+            <option value="entree">Entrée de stock</option>
+            <option value="sortie">Sortie de stock</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="stockQuantite">
+            <i class="bi bi-box"></i>
+            Quantité *
+          </label>
+          <input 
+            type="number" 
+            id="stockQuantite"
+            [(ngModel)]="stockForm.quantite"
+            name="quantite"
+            min="1"
+            required>
+        </div>
+        
+        <div class="form-group">
+          <label for="stockEmplacement">
+            <i class="bi bi-geo-alt"></i>
+            Emplacement *
+          </label>
+          <input 
+            type="text" 
+            id="stockEmplacement"
+            [(ngModel)]="stockForm.emplacement"
+            name="emplacement"
+            placeholder="Ex: Entrepôt principal, Rayon A..."
+            required>
+        </div>
+        
+        <div *ngIf="errorMessage" class="form-error">
+          <i class="bi bi-exclamation-circle"></i>
+          {{ errorMessage }}
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeStockModal()">
+            Annuler
+          </button>
+          <button type="button" class="submit-btn" (click)="submitStock()" [disabled]="loading">
+            <span *ngIf="!loading">
+              <i class="bi bi-check-circle"></i>
+              Valider l'opération
+            </span>
+            <span *ngIf="loading">
+              <i class="bi bi-arrow-clockwise spin"></i>
+              Traitement...
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
