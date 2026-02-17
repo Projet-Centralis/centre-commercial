@@ -1,8 +1,4 @@
-<!-- ══════════════════════════════════════════════════
-     EVENTS COMPONENT — DARK MODE · 100vh
-     ══════════════════════════════════════════════════ -->
 <div class="events-page">
-
   <!-- ── TOPBAR ── -->
   <header class="ev-topbar">
     <div class="ev-brand">
@@ -26,9 +22,7 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════
-       ZONE PRINCIPALE : aside + content
-       ══════════════════════════════════════ -->
+
   <div class="ev-main">
 
     <!-- ── GAUCHE : Mes inscriptions ── -->
@@ -172,10 +166,6 @@
   </div>
 </div>
 
-
-<!-- ══════════════════════════════════════════════════
-     POPUP — Détail événement
-     ══════════════════════════════════════════════════ -->
 <div class="popup-backdrop" *ngIf="selectedEvent" (click)="selectedEvent = null">
   <div class="popup-panel" (click)="$event.stopPropagation()">
 
