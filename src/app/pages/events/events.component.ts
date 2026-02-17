@@ -134,4 +134,104 @@ export class EventsComponent implements OnInit {
   isEventPast(event: any): boolean {
     return new Date(event.date_fin) < new Date();
   }
+  // ══════════════════════════════════════════════════════
+// AJOUTS TypeScript pour le composant Events
+// Coller ces propriétés / méthodes dans ta classe
+// ══════════════════════════════════════════════════════
+
+// ── Propriétés popup ──
+selectedEvent: any = null;
+
+openEventPopup(event: any) {
+  this.selectedEvent = event;
+}
+
+// ── Capacité (utilitaire) ──
+getCapacityPercent(event: any): number {
+  if (!event.capacite_max || event.capacite_max === 0) return 0;
+  const used = event.capacite_max - (event.capacite_restante || 0);
+  return Math.min(100, Math.round((used / event.capacite_max) * 100));
+}
+
+// ── Calendrier ──
+weekDays = ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'];
+currentYear  = new Date().getFullYear();
+currentMonth = new Date().getMonth(); // 0-based
+calendarCells: any[] = [];
+currentMonthLabel = '';
+selectedCalDay: number | null = null;
+selectedDayEvents: any[] = [];
+
+buildCalendar() {
+  const date = new Date(this.currentYear, this.currentMonth, 1);
+  const monthNames = [
+    'Janvier','Février','Mars','Avril','Mai','Juin',
+    'Juillet','Août','Septembre','Octobre','Novembre','Décembre'
+  ];
+  this.currentMonthLabel = `${monthNames[this.currentMonth]} ${this.currentYear}`;
+
+  // Premier jour de la semaine (lundi = 0)
+  let startDay = date.getDay() - 1;
+  if (startDay < 0) startDay = 6;
+
+  const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+  const today = new Date();
+  const cells: any[] = [];
+
+  // Cellules vides avant le 1er
+  for (let i = 0; i < startDay; i++) {
+    cells.push({ day: null, events: [] });
+  }
+
+  // Jours du mois
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday =
+      today.getDate() === d &&
+      today.getMonth() === this.currentMonth &&
+      today.getFullYear() === this.currentYear;
+
+    // Events qui tombent ce jour
+    const dayEvents = this.availableEvents.filter(ev => {
+      const evDate = new Date(ev.date_debut);
+      return (
+        evDate.getDate() === d &&
+        evDate.getMonth() === this.currentMonth &&
+        evDate.getFullYear() === this.currentYear
+      );
+    });
+
+    cells.push({ day: d, isToday, events: dayEvents });
+  }
+
+  this.calendarCells = cells;
+}
+
+prevMonth() {
+  if (this.currentMonth === 0) {
+    this.currentMonth = 11;
+    this.currentYear--;
+  } else {
+    this.currentMonth--;
+  }
+  this.selectedCalDay = null;
+  this.selectedDayEvents = [];
+  this.buildCalendar();
+}
+
+nextMonth() {
+  if (this.currentMonth === 11) {
+    this.currentMonth = 0;
+    this.currentYear++;
+  } else {
+    this.currentMonth++;
+  }
+  this.selectedCalDay = null;
+  this.selectedDayEvents = [];
+  this.buildCalendar();
+}
+
+selectCalDay(cell: any) {
+  this.selectedCalDay = cell.day;
+  this.selectedDayEvents = cell.events;
+}
 }
