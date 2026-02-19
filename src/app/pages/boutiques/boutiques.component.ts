@@ -235,5 +235,6 @@ export class BoutiquesComponent implements OnInit {
       }
     });
   }
+  
 
 }

@@ -65,7 +65,9 @@ export class HomeComponent implements OnInit {
       this.userName = user.email.split('@')[0];
     }
   }
-
+  onLogoError(event: Event, boutique: any): void {
+    boutique.logo = null; // Force le ng-template #iconFallback / #pointIconFallback
+  }
   loadBoutiques(): void {
     this.loading = true;
     this.error = '';
