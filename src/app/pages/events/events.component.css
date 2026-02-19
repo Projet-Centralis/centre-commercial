@@ -114,11 +114,15 @@
   border: 1px solid rgba(220, 53, 69, 0.25);
 }
 
+/* ══════════════════════════════════════════
+    MAIN — flex row, prend tout l'espace restant
+    ══════════════════════════════════════════ */
 .ev-main {
   flex: 1;
   display: flex;
   overflow: hidden;
   gap: 0;
+  min-height: 0; /* ← CRUCIAL pour que les enfants flex puissent shrink */
 }
 
 /* ── Panel header commun ── */
@@ -292,20 +296,22 @@
 
 /* ══════════════════════════════════════════
     CONTENT — Événements dispo (droite)
-    header fixe + scroll horizontal des cartes
     ══════════════════════════════════════════ */
 .ev-content {
   flex: 1;
+  min-width: 0;    /* ← empêche le débordement silencieux */
+  min-height: 0;   /* ← autorise le shrink vertical */
   display: flex;
   flex-direction: column;
-  overflow: hidden; 
-   min-height: 0; 
+  overflow: hidden;
 }
-/* Scroll horizontal */
+
+/* ── Scroll horizontal — LE FIX PRINCIPAL ── */
 .ev-hscroll {
+  flex: 1;         /* ← prend toute la hauteur restante dans .ev-content */
+  min-height: 0;   /* ← indispensable pour que flex: 1 fonctionne */
   display: flex;
   gap: 16px;
-   min-height: 0; 
   overflow-x: auto;
   overflow-y: hidden;
   padding: 20px 24px;
@@ -330,8 +336,7 @@
 .ev-card {
   flex-shrink: 0;
   width: 290px;
-  /* Hauteur calculée : 100vh - topbar(70) - panel-header(~61) - hscroll padding(40) - scrollbar(5) */
-  height: calc(100vh - 70px - 61px - 40px - 5px);
+  height: calc(100% - 40px); /* ← s'adapte à la hauteur réelle de .ev-hscroll */
   max-height: 480px;
   min-height: 300px;
   background: var(--bg-card);
@@ -425,7 +430,7 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  /* overflow           : hidden; */
+  overflow: hidden;
   flex-shrink: 0;
 }
 
@@ -436,6 +441,7 @@
   padding: 0 16px;
   line-height: 1.6;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .ev-card-details {
@@ -494,6 +500,7 @@
   gap: 8px;
   padding: 0 16px;
   flex-shrink: 0;
+  margin-top: auto; /* ← colle le footer en bas de la carte */
 }
 
 .btn-participate {
@@ -820,5 +827,115 @@
   }
   .brand-title {
     font-size: 1rem;
+  }
+}
+/* ══════════════════════════════════════════
+    AJOUTS — Grid 3 par page + navigation
+    (coller à la suite du CSS existant)
+    ══════════════════════════════════════════ */
+
+/* Remplacement de .ev-hscroll par .ev-grid */
+.ev-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 20px 24px;
+  overflow-y: auto;
+  align-content: start;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-card2) transparent;
+}
+.ev-grid::-webkit-scrollbar { width: 4px; }
+.ev-grid::-webkit-scrollbar-thumb {
+  background: var(--bg-card2);
+  border-radius: 4px;
+}
+
+/* Les cartes occupent toute la largeur de leur colonne */
+.ev-grid .ev-card {
+  width: 100%;
+  height: auto;
+  min-height: 300px;
+  max-height: 480px;
+}
+
+/* ── Navigation prev / next dans le panel-header ── */
+.ev-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.ev-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.ev-nav-btn:hover:not(:disabled) {
+  color: var(--teal);
+  border-color: rgba(50, 188, 174, 0.4);
+  background: rgba(50, 188, 174, 0.08);
+}
+.ev-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.ev-nav-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ev-nav-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-sub);
+  cursor: pointer;
+  transition: all 0.22s;
+}
+.ev-nav-dot--active {
+  background: var(--teal);
+  box-shadow: 0 0 6px rgba(50, 188, 174, 0.5);
+  transform: scale(1.25);
+}
+.ev-nav-dot:hover:not(.ev-nav-dot--active) {
+  background: var(--text-muted);
+}
+
+.ev-nav-counter {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  min-width: 34px;
+  text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .ev-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .ev-grid {
+    grid-template-columns: 1fr;
+    padding: 14px 16px;
+  }
+  .ev-grid .ev-card {
+    max-height: unset;
   }
 }

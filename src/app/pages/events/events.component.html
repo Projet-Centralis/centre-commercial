@@ -73,7 +73,25 @@
       <div class="ev-panel-header">
         <span class="title-accent"></span>
         <h2 class="ev-panel-title">Événements disponibles</h2>
-        <span class="scroll-hint"><i class="bi bi-arrow-left-right"></i> Défiler</span>
+
+        <!-- Navigation dots + arrows -->
+        <div class="ev-nav" *ngIf="!isLoadingAvailable && availableEvents.length > 0">
+          <button class="ev-nav-btn" (click)="prevPage()" [disabled]="currentPage === 0">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <div class="ev-nav-dots">
+            <span
+              class="ev-nav-dot"
+              *ngFor="let p of getPages()"
+              [class.ev-nav-dot--active]="p === currentPage"
+              (click)="goToPage(p)"
+            ></span>
+          </div>
+          <button class="ev-nav-btn" (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+          <span class="ev-nav-counter">{{ currentPage + 1 }} / {{ totalPages }}</span>
+        </div>
       </div>
 
       <!-- Loading -->
@@ -88,12 +106,12 @@
         <p class="ev-state-label">Aucun événement disponible</p>
       </div>
 
-      <!-- Horizontal scroll -->
-      <div class="ev-hscroll" *ngIf="!isLoadingAvailable && availableEvents.length > 0">
+      <!-- Grid 3 par page -->
+      <div class="ev-grid" *ngIf="!isLoadingAvailable && availableEvents.length > 0">
         <div
           class="ev-card"
-          *ngFor="let event of availableEvents; let i = index"
-          [style.animation-delay]="(i * 0.05) + 's'"
+          *ngFor="let event of pagedEvents; let i = index"
+          [style.animation-delay]="(i * 0.07) + 's'"
           [class.ev-card--full]="isEventFull(event)"
           [class.ev-card--past]="isEventPast(event)"
           (click)="openEventPopup(event)"
