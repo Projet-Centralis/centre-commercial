@@ -1,21 +1,7 @@
-<!-- <nav class="sidebar">
-  <a routerLink="/accueil" routerLinkActive="active">Accueil</a>
-  <a routerLink="/boutiques" routerLinkActive="active">Boutiques</a>
-  <a routerLink="/promotions" routerLinkActive="active">Promotions</a>
-  <a routerLink="/forums" routerLinkActive="active">Forums</a>
-  <a routerLink="/events" routerLinkActive="active">Events</a>
-</nav> -->
+<nav class="sidebar" *ngIf="userType$ | async as userType">
 
-
-<nav class="sidebar">
-  <!-- Liens communs pour tous les utilisateurs -->
-  <!-- <a routerLink="/accueil" routerLinkActive="active">
-    <i class="bi bi-house"></i>
-    <span>Accueil</span>
-  </a> -->
-  
-  <!-- Liens spécifiques pour les BOUTIQUES -->
-  <ng-container *ngIf="isBoutique">
+  <!-- ================= BOUTIQUE ================= -->
+  <ng-container *ngIf="userType === 'BOUTIQUE'">
     <a routerLink="/boutique/dashboard" routerLinkActive="active">
       <i class="bi bi-house"></i>
       <span>Dashboard</span>
@@ -42,13 +28,13 @@
     </a>
   </ng-container>
 
-  <!-- Liens pour les ACHETEURS -->
 
-  <ng-container *ngIf="!isBoutique">
+  <!-- ================= ACHETEUR ================= -->
+  <ng-container *ngIf="userType === 'ACHETEUR'">
     <a routerLink="/accueil" routerLinkActive="active">
-    <i class="bi bi-house"></i>
-    <span>Accueil</span>
-  </a>
+      <i class="bi bi-house"></i>
+      <span>Accueil</span>
+    </a>
     <a routerLink="/boutiques" routerLinkActive="active">
       <i class="bi bi-shop"></i>
       <span>Boutiques</span>
@@ -66,4 +52,22 @@
       <span>Events</span>
     </a>
   </ng-container>
+
+
+  <!-- ================= ADMIN ================= -->
+  <ng-container *ngIf="userType === 'ADMIN'">
+    <a routerLink="/admin/dashboard" routerLinkActive="active">
+      <i class="bi bi-speedometer2"></i>
+      <span>Dashboard</span>
+    </a>
+    <a routerLink="/admin/users" routerLinkActive="active">
+      <i class="bi bi-people"></i>
+      <span>Gestion des Events</span>
+    </a>
+    <a routerLink="/admin/boutiques" routerLinkActive="active">
+      <i class="bi bi-shop"></i>
+      <span>Gestion des loyers</span>
+    </a>
+  </ng-container>
+
 </nav>
