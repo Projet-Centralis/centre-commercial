@@ -1,18 +1,4 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-header',
-//   standalone: true,
-//   imports: [],
-//   templateUrl: './header.component.html',
-//   styleUrl: './header.component.css'
-// })
-// export class HeaderComponent {
-
-// }
-
-
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -26,20 +12,61 @@ import { NotificationService } from '../../services/notification.service';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
+
   isAuthenticated = false;
   userEmail = '';
   userType = '';
   userName = '';
 
-  constructor(private authService: AuthService) {}
+  unreadCount = 0;
+  notifications: any[] = [];
+
+  showPanel = false;
+  showToast = false;
+  toastMessage: any = {};
+
+  constructor(
+    private authService: AuthService,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
+      console.log('[Header] currentUser$:', user);
       this.isAuthenticated = !!user;
       this.userEmail = user?.email || '';
       this.userType = user?.type_user || '';
       this.userName = this.getUserName();
+
+      if (user) {
+        this.notificationService.startListening();
+      }
     });
+
+    this.notificationService.unreadCountObservable$.subscribe(count => {
+      console.log('[Header] unreadCount mis à jour:', count);
+      this.unreadCount = count;
+    });
+
+    this.notificationService.notifications$.subscribe(notifs => {
+      console.log('[Header] notifications$ mis à jour:', notifs);
+      this.notifications = notifs;
+    });
+
+    this.notificationService.popup$.subscribe(event => {
+      console.log('[Header] popup$ reçu:', event);
+      this.toastMessage = event;
+      this.showToast = true;
+      setTimeout(() => {
+        this.showToast = false;
+        console.log('[Header] Toast masqué');
+      }, 4000);
+    });
+  }
+
+  toggleNotifPanel(): void {
+    this.showPanel = !this.showPanel;
+    console.log('[Header] Panel toggled:', this.showPanel);
   }
 
   private getUserName(): string {
@@ -51,7 +78,7 @@ export class HeaderComponent implements OnInit {
   }
 
   getUserTypeText(): string {
-    switch(this.userType) {
+    switch (this.userType) {
       case 'ACHETEUR': return 'Acheteur';
       case 'BOUTIQUE': return 'Boutique';
       case 'ADMIN': return 'Administrateur';
