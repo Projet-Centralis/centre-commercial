@@ -34,33 +34,27 @@
           d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
       </svg>
       Mes favoris
-      <span *ngIf="favorisIds.size > 0" class="badge">{{ favorisIds.size
-        }}</span>
+      <span *ngIf="favorisIds.size > 0" class="badge">{{ favorisIds.size }}</span>
     </button>
   </div>
 
-  <!-- Contenu principal -->
   <div class="main-content">
-    <!-- Liste des boutiques à gauche -->
     <div class="boutiques-sidebar">
       <h2 class="sidebar-title">
         Boutiques
         <span class="count">{{ boutiques.length }}</span>
       </h2>
 
-      <!-- Loader -->
       <div *ngIf="loading" class="loader-container">
         <div class="loader"></div>
         <p>Chargement...</p>
       </div>
 
-      <!-- Message d'erreur -->
       <div *ngIf="error" class="error-message">
         <p>{{ error }}</p>
         <button (click)="loadBoutiques()" class="retry-btn">Réessayer</button>
       </div>
 
-      <!-- Liste des boutiques -->
       <div *ngIf="!loading && !error" class="boutiques-list">
         <div
           *ngFor="let boutique of boutiques"
@@ -80,7 +74,6 @@
               <p class="boutique-email">
                 Nombre de favoris : {{ favorisCount[boutique._id] || 0 }}
               </p>
-
             </div>
           </div>
 
@@ -103,7 +96,6 @@
           </button>
         </div>
 
-        <!-- Message si aucune boutique -->
         <div *ngIf="boutiques.length === 0" class="empty-state-small">
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
             viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -117,7 +109,6 @@
       </div>
     </div>
 
-    <!-- Zone des produits à droite -->
     <div class="produits-section">
       <div *ngIf="selectedBoutique" class="boutique-header">
         <div class="boutique-header-content">
@@ -127,13 +118,10 @@
             class="boutique-header-logo">
 
           <div class="boutique-header-info">
-            <h1 class="boutique-header-name">{{ selectedBoutique.nom_boutique
-              }}</h1>
-            <p class="boutique-header-description">{{
-              selectedBoutique.description }}</p>
+            <h1 class="boutique-header-name">{{ selectedBoutique.nom_boutique }}</h1>
+            <p class="boutique-header-description">{{ selectedBoutique.description }}</p>
             <p class="boutique-email">
-              Nombre de personnes ayant ajouté aux favoris : {{
-              favorisCount[selectedBoutique._id] || 0 }}
+              Nombre de personnes ayant ajouté aux favoris : {{ favorisCount[selectedBoutique._id] || 0 }}
             </p>
             <div class="boutique-header-meta">
               <span class="meta-item">
@@ -151,13 +139,11 @@
         </div>
       </div>
 
-      <!-- Loader produits -->
       <div *ngIf="loadingProduits" class="loader-container">
         <div class="loader"></div>
         <p>Chargement des produits...</p>
       </div>
 
-      <!-- Liste des produits -->
       <div *ngIf="!loadingProduits && selectedBoutique" class="produits-grid">
         <h2 class="section-title">
           Produits
@@ -166,12 +152,18 @@
 
         <div *ngIf="produits.length > 0" class="produits-container">
           <div *ngFor="let produit of produits" class="produit-card">
+
             <div class="produit-image">
               <img
                 *ngFor="let img of produit.images"
-                [src]="'/'+ img"
+                [src]="'/' + img"
                 [alt]="produit.nom_produit"
                 class="produit-img" />
+
+              <!-- Badge réduction -->
+              <div *ngIf="getPromotion(produit._id)" class="promo-badge">
+                -{{ getPromotion(produit._id).pourcentage_reduction }}%
+              </div>
             </div>
 
             <div class="produit-info">
@@ -180,15 +172,26 @@
 
               <div class="produit-footer">
                 <div class="produit-price">
-                  <span class="price">{{ produit.prix }} Ar</span>
-                  <!-- <span class="stock">Stock: {{ produit.stock }}</span> -->
+
+                  <!-- Prix SANS promo -->
+                  <ng-container *ngIf="!getPromotion(produit._id)">
+                    <span class="price">{{ produit.prix }} Ar</span>
+                  </ng-container>
+
+                  <!-- Prix AVEC promo -->
+                  <ng-container *ngIf="getPromotion(produit._id) as promo">
+                    <span class="price-original">{{ produit.prix }} Ar</span>
+                    <span class="price price-promo">{{ getPrixPromo(produit) }} Ar</span>
+                    <span class="promo-label">{{ promo.titre }}</span>
+                  </ng-container>
+
                 </div>
               </div>
             </div>
+
           </div>
         </div>
 
-        <!-- Message si aucun produit -->
         <div *ngIf="produits.length === 0" class="empty-state">
           <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
             viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -201,7 +204,6 @@
         </div>
       </div>
 
-      <!-- Message si aucune boutique sélectionnée -->
       <div *ngIf="!selectedBoutique && !loading" class="empty-state">
         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
           viewBox="0 0 24 24" fill="none" stroke="currentColor"

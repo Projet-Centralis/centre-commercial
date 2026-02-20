@@ -1,0 +1,80 @@
+<div class="admin-container">
+  <!-- Message de feedback -->
+  <div *ngIf="message" class="message" [ngClass]="message.type">
+    {{ message.text }}
+  </div>
+
+  <!-- Section : Demandes d'événements -->
+  <section class="pending-section">
+    <h2>Demandes d'événements ({{ pendingEvents.length }})</h2>
+    <div *ngIf="pendingEvents.length === 0" class="empty">
+      Aucune demande en attente.
+    </div>
+    <div class="pending-grid">
+      <div *ngFor="let event of pendingEvents" class="pending-card">
+        <div class="card-header">
+          <span class="boutique">{{ event.boutique.nom_boutique }}</span>
+          <span class="statut">{{ event.statut }}</span>
+        </div>
+        <h3>{{ event.titre }}</h3>
+        <p class="description">{{ event.description }}</p>
+        <div class="dates">
+          <div>Début : {{ event.date_debut | date:'dd/MM/yyyy HH:mm' }}</div>
+          <div>Fin : {{ event.date_fin | date:'dd/MM/yyyy HH:mm' }}</div>
+        </div>
+        <div class="capacity">Capacité max : {{ event.capacite_max }}</div>
+        <div class="actions">
+          <button class="btn-accept" (click)="acceptEvent(event._id)">Accepter</button>
+          <button class="btn-reject" (click)="rejectEvent(event._id)">Refuser</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section : Calendrier des événements validés -->
+  <section class="calendar-section">
+    <div class="calendar-header">
+      <h2>Événements validés</h2>
+      <div class="month-nav">
+        <button (click)="prevMonth()" class="nav-btn">←</button>
+        <span class="month-year">{{ currentMonth | date:'MMMM yyyy' }}</span>
+        <button (click)="nextMonth()" class="nav-btn">→</button>
+      </div>
+    </div>
+
+    <!-- Jours de la semaine -->
+    <div class="weekdays">
+      <div *ngFor="let day of ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']">{{ day }}</div>
+    </div>
+
+    <!-- Grille du calendrier -->
+    <div class="calendar-grid">
+      <div
+        *ngFor="let day of calendarDays"
+        class="calendar-cell"
+        [class.other-month]="day.date.getMonth() !== currentMonth.getMonth()"
+        [class.has-event]="day.events.length > 0"
+        (click)="openDayEvents(day)"
+      >
+        <span class="day-number">{{ day.date.getDate() }}</span>
+        <div *ngIf="day.events.length > 0" class="event-indicator">
+          <span class="dot"></span>
+          <span class="event-count">{{ day.events.length }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modale simple pour afficher les événements d'un jour -->
+  <div class="modal" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>Événements du {{ selectedDayEvents[0]?.date_debut | date:'dd/MM/yyyy' }}</h3>
+      <div *ngFor="let event of selectedDayEvents" class="modal-event">
+        <strong>{{ event.titre }}</strong> - {{ event.boutique.nom_boutique }}
+        <div>{{ event.date_debut | date:'HH:mm' }} - {{ event.date_fin | date:'HH:mm' }}</div>
+        <p>{{ event.description }}</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">Fermer</button>
+    </div>
+  </div>
+</div>
