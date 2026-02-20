@@ -196,9 +196,26 @@ export class EventService {
       })
     );
   }
+   // Rejeter un événement (admin)
+  rejeterEvent(id: string): Observable<ApiResponse<Event>> {
+    return this.http.put<ApiResponse<Event>>(`${this.apiUrl}/${id}/rejeter`, {}).pipe(
+      catchError(error => {
+        console.error('Erreur rejet événement:', error);
+        return of({
+          success: false,
+          message: error.error?.message || 'Erreur lors du rejet'
+        });
+      })
+    );
+  }
   // Récupérer tous les événements valides
   getEventsValide(): Observable<any> {
     return this.http.get(`${this.apiUrl}/events_valide`, {
+      headers: this.getHeaders()
+    });
+  }
+  getEventsNonValide(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/non_valide`, {
       headers: this.getHeaders()
     });
   }
