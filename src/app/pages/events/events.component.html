@@ -1,1 +1,269 @@
-<p>events works!</p>
+<div class="events-page">
+  <!-- ── TOPBAR ── -->
+  <header class="ev-topbar">
+    <div class="ev-brand">
+      <div class="ev-brand-icon"><i class="bi bi-calendar-event-fill"></i></div>
+      <div>
+        <h1 class="brand-title">Participer aux évènements</h1>
+        <p class="brand-subtitle">
+          {{ availableEvents.length }} disponible{{ availableEvents.length !== 1 ? 's' : '' }}
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── MESSAGES ── -->
+  <div class="ev-messages" *ngIf="successMessage || errorMessage">
+    <div class="ev-msg ev-msg--success" *ngIf="successMessage">
+      <i class="bi bi-check-circle-fill"></i> {{ successMessage }}
+    </div>
+    <div class="ev-msg ev-msg--error" *ngIf="errorMessage">
+      <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
+    </div>
+  </div>
+
+
+  <div class="ev-main">
+
+    <!-- ── GAUCHE : Mes inscriptions ── -->
+    <aside class="ev-aside">
+      <div class="ev-panel-header">
+        <span class="title-accent"></span>
+        <h2 class="ev-panel-title">Mes inscriptions</h2>
+      </div>
+
+      <div class="ev-state-center mini" *ngIf="isLoadingMy">
+        <div class="dark-spinner"></div>
+      </div>
+
+      <div class="ev-my-list" *ngIf="!isLoadingMy">
+
+        <div class="ev-empty-state" *ngIf="myEvents.length === 0">
+          <i class="bi bi-calendar2-week"></i>
+          <p>Aucune inscription</p>
+          <span>Rejoignez un événement →</span>
+        </div>
+
+        <div
+          class="ev-my-item"
+          *ngFor="let event of myEvents; let i = index"
+          [style.animation-delay]="(i * 0.05) + 's'"
+        >
+          <div class="ev-my-dot"></div>
+          <div class="ev-my-info">
+            <h4 class="ev-my-title">{{ event.titre }}</h4>
+            <div class="ev-my-meta">
+              <span><i class="bi bi-calendar3"></i> {{ formatDate(event.date_debut) }}</span>
+              <span><i class="bi bi-clock"></i> {{ formatTime(event.date_debut) }}</span>
+            </div>
+          </div>
+          <div class="ev-my-places">
+            <span class="places-num" *ngIf="!event.isLoadingCapacity">{{ event.capacite_restante || 0 }}</span>
+            <span class="places-num" *ngIf="event.isLoadingCapacity">…</span>
+            <span class="places-label">places</span>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ── DROITE : Événements disponibles ── -->
+    <section class="ev-content">
+
+      <div class="ev-panel-header">
+        <span class="title-accent"></span>
+        <h2 class="ev-panel-title">Événements disponibles</h2>
+
+        <!-- Navigation dots + arrows -->
+        <div class="ev-nav" *ngIf="!isLoadingAvailable && availableEvents.length > 0">
+          <button class="ev-nav-btn" (click)="prevPage()" [disabled]="currentPage === 0">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <div class="ev-nav-dots">
+            <span
+              class="ev-nav-dot"
+              *ngFor="let p of getPages()"
+              [class.ev-nav-dot--active]="p === currentPage"
+              (click)="goToPage(p)"
+            ></span>
+          </div>
+          <button class="ev-nav-btn" (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+          <span class="ev-nav-counter">{{ currentPage + 1 }} / {{ totalPages }}</span>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="ev-state-center" *ngIf="isLoadingAvailable">
+        <div class="dark-spinner"></div>
+        <span class="ev-state-sub">Chargement…</span>
+      </div>
+
+      <!-- Empty -->
+      <div class="ev-state-center" *ngIf="!isLoadingAvailable && availableEvents.length === 0">
+        <i class="bi bi-calendar-x ev-state-icon"></i>
+        <p class="ev-state-label">Aucun événement disponible</p>
+      </div>
+
+      <!-- Grid 3 par page -->
+      <div class="ev-grid" *ngIf="!isLoadingAvailable && availableEvents.length > 0">
+        <div
+          class="ev-card"
+          *ngFor="let event of pagedEvents; let i = index"
+          [style.animation-delay]="(i * 0.07) + 's'"
+          [class.ev-card--full]="isEventFull(event)"
+          [class.ev-card--past]="isEventPast(event)"
+          (click)="openEventPopup(event)"
+        >
+          <div class="ev-card-accent"></div>
+
+          <div class="ev-card-badges">
+            <span class="ev-badge ev-badge--full" *ngIf="isEventFull(event)">Complet</span>
+            <span class="ev-badge ev-badge--past" *ngIf="!isEventFull(event) && isEventPast(event)">Terminé</span>
+          </div>
+
+          <h3 class="ev-card-title">{{ event.titre }}</h3>
+          <p class="ev-card-desc">
+            {{ event.description | slice:0:100 }}{{ event.description?.length > 100 ? '…' : '' }}
+          </p>
+
+          <div class="ev-card-details">
+            <div class="ev-detail">
+              <i class="bi bi-calendar3"></i>
+              <span>{{ formatDate(event.date_debut) }}</span>
+            </div>
+            <div class="ev-detail">
+              <i class="bi bi-clock"></i>
+              <span>{{ formatTime(event.date_debut) }} – {{ formatTime(event.date_fin) }}</span>
+            </div>
+            <div class="ev-detail">
+              <i class="bi bi-people-fill"></i>
+              <span *ngIf="!event.isLoadingCapacity">
+                {{ event.capacite_restante || 0 }} / {{ event.capacite_max }} places
+              </span>
+              <span *ngIf="event.isLoadingCapacity">…</span>
+            </div>
+            <div class="ev-detail" *ngIf="event.boutique">
+              <i class="bi bi-shop"></i>
+              <span>{{ event.boutique.nom_boutique }}</span>
+            </div>
+          </div>
+
+          <div class="ev-capacity-bar">
+            <div
+              class="ev-capacity-fill"
+              [style.width]="getCapacityPercent(event) + '%'"
+              [class.ev-capacity-fill--warn]="getCapacityPercent(event) > 75"
+              [class.ev-capacity-fill--full]="isEventFull(event)"
+            ></div>
+          </div>
+
+          <div class="ev-card-footer">
+            <button
+              class="btn-participate"
+              [class.btn-participate--disabled]="isEventFull(event) || isEventPast(event)"
+              [disabled]="isEventFull(event) || isEventPast(event)"
+              (click)="$event.stopPropagation(); registerToEvent(event._id)"
+            >
+              <i class="bi bi-person-plus-fill" *ngIf="!isEventFull(event) && !isEventPast(event)"></i>
+              <i class="bi bi-x-circle"         *ngIf="isEventFull(event)"></i>
+              <i class="bi bi-clock-history"    *ngIf="!isEventFull(event) && isEventPast(event)"></i>
+              <span *ngIf="!isEventFull(event) && !isEventPast(event)">Participer</span>
+              <span *ngIf="isEventFull(event)">Complet</span>
+              <span *ngIf="!isEventFull(event) && isEventPast(event)">Terminé</span>
+            </button>
+            <button class="btn-detail" (click)="$event.stopPropagation(); openEventPopup(event)">
+              <i class="bi bi-info-circle"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</div>
+
+<div class="popup-backdrop" *ngIf="selectedEvent" (click)="selectedEvent = null">
+  <div class="popup-panel" (click)="$event.stopPropagation()">
+
+    <div class="popup-header">
+      <div class="popup-header-badges">
+        <span class="ev-badge ev-badge--valide" *ngIf="selectedEvent.statut === 'valide'">
+          {{ getStatusLabel(selectedEvent.statut) }}
+        </span>
+        <span class="ev-badge ev-badge--full" *ngIf="isEventFull(selectedEvent)">Complet</span>
+      </div>
+      <button class="btn-close-popup" (click)="selectedEvent = null">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="popup-body">
+      <h2 class="popup-title">{{ selectedEvent.titre }}</h2>
+      <p class="popup-desc">{{ selectedEvent.description }}</p>
+
+      <div class="popup-details-grid">
+        <div class="popup-detail-card">
+          <i class="bi bi-calendar3"></i>
+          <div>
+            <span class="pd-label">Date</span>
+            <span class="pd-value">{{ formatDate(selectedEvent.date_debut) }}</span>
+          </div>
+        </div>
+        <div class="popup-detail-card">
+          <i class="bi bi-clock-fill"></i>
+          <div>
+            <span class="pd-label">Horaire</span>
+            <span class="pd-value">{{ formatTime(selectedEvent.date_debut) }} – {{ formatTime(selectedEvent.date_fin) }}</span>
+          </div>
+        </div>
+        <div class="popup-detail-card">
+          <i class="bi bi-people-fill"></i>
+          <div>
+            <span class="pd-label">Capacité</span>
+            <span class="pd-value">{{ selectedEvent.capacite_restante || 0 }} / {{ selectedEvent.capacite_max }} places</span>
+          </div>
+        </div>
+        <div class="popup-detail-card" *ngIf="selectedEvent.boutique">
+          <i class="bi bi-shop"></i>
+          <div>
+            <span class="pd-label">Boutique</span>
+            <span class="pd-value">{{ selectedEvent.boutique.nom_boutique }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="popup-cap-wrap">
+        <div class="popup-cap-labels">
+          <span>Places disponibles</span>
+          <span>{{ getCapacityPercent(selectedEvent) }}%</span>
+        </div>
+        <div class="ev-capacity-bar large">
+          <div
+            class="ev-capacity-fill"
+            [style.width]="getCapacityPercent(selectedEvent) + '%'"
+            [class.ev-capacity-fill--warn]="getCapacityPercent(selectedEvent) > 75"
+            [class.ev-capacity-fill--full]="isEventFull(selectedEvent)"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="popup-footer">
+      <button class="btn-ghost" (click)="selectedEvent = null">Fermer</button>
+      <button
+        class="btn-participate large"
+        [class.btn-participate--disabled]="isEventFull(selectedEvent) || isEventPast(selectedEvent)"
+        [disabled]="isEventFull(selectedEvent) || isEventPast(selectedEvent)"
+        (click)="registerToEvent(selectedEvent._id); selectedEvent = null"
+      >
+        <i class="bi bi-person-plus-fill" *ngIf="!isEventFull(selectedEvent) && !isEventPast(selectedEvent)"></i>
+        <span *ngIf="!isEventFull(selectedEvent) && !isEventPast(selectedEvent)">S'inscrire à l'événement</span>
+        <span *ngIf="isEventFull(selectedEvent)">Événement complet</span>
+        <span *ngIf="!isEventFull(selectedEvent) && isEventPast(selectedEvent)">Événement terminé</span>
+      </button>
+    </div>
+
+  </div>
+</div>

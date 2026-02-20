@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { BoutiqueService } from '../../services/boutique.service';
 import { ProduitService,ApiResponse,Produit } from '../../services/produit.service';
+import { ProduitService } from '../../services/produit.service';
+import { PromotionService } from '../../services/promotions.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -30,10 +32,13 @@ export class BoutiquesComponent implements OnInit {
   error: string | null = null;
 
   favorisCount: { [boutiqueId: string]: number } = {};
+  promotions: any[] = [];
+  promotionMap: { [produitId: string]: any } = {};
 
   constructor(
     private boutiqueService: BoutiqueService,
-    private produitService: ProduitService
+    private produitService: ProduitService,
+    private promotionService: PromotionService
   ) { }
 
   ngOnInit(): void {
@@ -66,7 +71,6 @@ export class BoutiquesComponent implements OnInit {
       }
     });
   }
-
 
   loadUserFavoris(): void {
     this.boutiqueService.getUserFavoris().subscribe({
@@ -138,6 +142,56 @@ export class BoutiquesComponent implements OnInit {
      });
    }
   
+    this.loadPromotionsThenProduits(boutique._id);
+  }
+
+  loadPromotionsThenProduits(boutiqueId: string): void {
+    this.loadingProduits = true;
+    this.produits = [];
+    this.promotionMap = {};
+
+    this.promotionService.getAllPromotions(boutiqueId).subscribe({
+      next: (promos) => {
+        const liste = Array.isArray(promos) ? promos : (promos.data || []);
+        liste.forEach((promo: any) => {
+          const produitId = promo.produit?._id || promo.produit;
+          if (produitId && promo.actif) {
+            this.promotionMap[produitId] = promo;
+          }
+        });
+        this.loadProduits(boutiqueId);
+      },
+      error: (err) => {
+        console.error('Erreur chargement promotions:', err);
+        this.loadProduits(boutiqueId);
+      }
+    });
+  }
+
+  loadProduits(boutiqueId: string): void {
+    this.produitService.getProductsBoutique(boutiqueId).subscribe({
+      next: (response) => {
+        this.produits = response.data || response;
+        this.loadingProduits = false;
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des produits:', err);
+        this.loadingProduits = false;
+      }
+    });
+  }
+
+  getPromotion(produitId: string): any {
+    return this.promotionMap[produitId] || null;
+  }
+
+  getPrixPromo(produit: any): number {
+    const promo = this.getPromotion(produit._id);
+    if (promo) {
+      return Math.round(produit.prix * (1 - promo.pourcentage_reduction / 100));
+    }
+    return produit.prix;
+  }
 
   isFavori(boutiqueId: string): boolean {
     return this.favorisIds.has(boutiqueId);
@@ -160,7 +214,6 @@ export class BoutiquesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur lors de l\'ajout aux favoris:', err);
-
         if (err.error?.message?.includes('déjà dans vos favoris')) {
           this.favorisIds.add(boutiqueId);
         } else {
@@ -174,7 +227,6 @@ export class BoutiquesComponent implements OnInit {
     this.boutiqueService.deleteFavori(boutiqueId).subscribe({
       next: (response) => {
         this.favorisIds.delete(boutiqueId);
-
         if (this.showOnlyFavoris) {
           this.filterBoutiques();
         }
@@ -238,13 +290,9 @@ export class BoutiquesComponent implements OnInit {
         this.favorisCount[boutiqueId] = res.favoris_count;
       },
       error: (err) => {
-        console.error(
-          `Erreur chargement nombre favoris boutique ${boutiqueId}`,
-          err
-        );
+        console.error(`Erreur chargement nombre favoris boutique ${boutiqueId}`, err);
         this.favorisCount[boutiqueId] = 0;
       }
     });
   }
-
 }
