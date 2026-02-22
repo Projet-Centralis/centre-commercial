@@ -1,1 +1,223 @@
-<p>forums works!</p>
+<!-- ══════════════════════════════════════════
+     FORUM PAGE — liste discussions (100vh)
+     ══════════════════════════════════════════ -->
+<div class="forum-page">
+
+  <!-- ── TOPBAR ── -->
+  <header class="forum-topbar">
+    <div class="topbar-brand">
+      <div class="brand-icon"><i class="bi bi-chat-square-dots-fill"></i></div>
+      <div>
+        <h1 class="brand-title">Forum de discussion</h1>
+        <h2 class="brand-subtitle">Partagez vos idées et questions</h2>
+        <!-- <p class="brand-subtitle1">{{ discussions.length }} discussion{{ discussions.length !== 1 ? 's' : '' }}</p> -->
+      </div>
+    </div>
+    <button class="btn-new" data-bs-toggle="collapse" data-bs-target="#createPanel">
+      <i class="bi bi-plus-lg"></i> Nouvelle discussion
+    </button>
+  </header>
+
+  <!-- ── PANNEAU CRÉATION (collapse) ── -->
+  <div class="collapse" id="createPanel">
+    <div class="create-panel">
+      <input
+        class="dark-input"
+        type="text"
+        [(ngModel)]="newTitre"
+        placeholder="Titre de la discussion…"
+      />
+      <textarea
+        class="dark-input dark-textarea"
+        [(ngModel)]="newContenu"
+        placeholder="Décrivez votre sujet en détail…"
+        rows="3"
+      ></textarea>
+      <div class="create-actions">
+        <button class="btn-ghost" data-bs-toggle="collapse" data-bs-target="#createPanel">Annuler</button>
+        <button class="btn-teal" (click)="createDiscussion()">
+          <i class="bi bi-send-fill"></i> Publier
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LISTE ── -->
+  <main class="forum-main">
+
+    <div class="state-center" *ngIf="loading">
+      <div class="dark-spinner"></div>
+      <span class="state-sub">Chargement…</span>
+    </div>
+
+    <div class="state-center" *ngIf="!loading && discussions.length === 0">
+      <i class="bi bi-chat-right-text state-icon"></i>
+      <p class="state-label">Aucune discussion</p>
+      <span class="state-sub">Lancez le premier débat !</span>
+    </div>
+
+    <ul class="disc-list" *ngIf="!loading && discussions.length > 0">
+      <li
+        class="disc-item"
+        *ngFor="let d of discussions; let i = index"
+        [style.animation-delay]="(i * 0.04) + 's'"
+        (click)="openDiscussion(d._id)"
+      >
+        <div class="disc-avatar"><i class="bi bi-person-fill"></i></div>
+        <div class="disc-body">
+          <div class="disc-top-row">
+            <span class="disc-title">{{ d.titre }}</span>
+            <span class="disc-date">{{ d.createdAt | date:'dd/MM/yy' }}</span>
+          </div>
+          <p class="disc-preview">
+            {{ d.contenu | slice:0:120 }}{{ d.contenu?.length > 120 ? '…' : '' }}
+          </p>
+          <div class="disc-footer">
+            <span class="disc-chip"><i class="bi bi-person"></i>{{ d.acheteur?.email }}</span>
+            <span class="disc-chip"><i class="bi bi-eye"></i>{{ d.nombre_vues || 0 }}</span>
+            <span class="disc-chip"><i class="bi bi-chat-dots"></i>{{ d.nbCommentaires || 0 }}</span>
+          </div>
+        </div>
+        <div class="disc-arrow"><i class="bi bi-chevron-right"></i></div>
+      </li>
+    </ul>
+
+  </main>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     POPUP — discussion ouverte
+     ══════════════════════════════════════════ -->
+<div
+  class="popup-backdrop"
+  *ngIf="selectedDiscussion"
+  (click)="selectedDiscussion = null; commentaires = []"
+>
+  <div class="popup-panel" (click)="$event.stopPropagation()">
+
+    <!-- ── POPUP HEADER ── -->
+    <div class="popup-header">
+      <div class="popup-author-row">
+        <div class="popup-avatar"><i class="bi bi-person-fill"></i></div>
+        <div class="popup-author-info">
+          <span class="popup-author">{{ selectedDiscussion.acheteur?.email || 'Anonyme' }}</span>
+          <span class="popup-post-date">
+            <i class="bi bi-calendar3"></i>
+            {{ selectedDiscussion.createdAt | date:'dd MMMM yyyy' }}
+          </span>
+        </div>
+        <div class="popup-stats">
+          <span class="popup-stat"><i class="bi bi-eye-fill"></i>{{ selectedDiscussion.nombre_vues || 0 }}</span>
+          <span class="popup-stat"><i class="bi bi-chat-dots-fill"></i>{{ commentaires.length }}</span>
+        </div>
+      </div>
+      <button class="btn-close-popup" (click)="selectedDiscussion = null; commentaires = []">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- ── POPUP BODY (scrollable) ── -->
+    <div class="popup-body">
+
+      <!-- Contenu discussion -->
+      <div class="popup-disc-block">
+        <h2 class="popup-disc-title">{{ selectedDiscussion.titre }}</h2>
+        <p class="popup-disc-text">{{ selectedDiscussion.contenu }}</p>
+      </div>
+
+      <!-- Séparateur -->
+      <div class="section-sep">
+        <span class="sep-label">
+          <i class="bi bi-chat-left-text-fill"></i>
+          {{ commentaires.length }} commentaire{{ commentaires.length !== 1 ? 's' : '' }}
+        </span>
+        <div class="sep-line"></div>
+      </div>
+
+      <!-- Composer -->
+      <div class="composer">
+        <div class="composer-avt"><i class="bi bi-person-fill"></i></div>
+        <div class="composer-wrap">
+          <textarea
+            class="dark-input composer-ta"
+            [(ngModel)]="newCommentaire"
+            placeholder="Ajouter un commentaire…"
+            rows="2"
+          ></textarea>
+          <button class="btn-send" (click)="addCommentaire()" [disabled]="!newCommentaire.trim()">
+            <i class="bi bi-send-fill"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty comments -->
+      <div class="state-center mini" *ngIf="commentaires.length === 0">
+        <i class="bi bi-chat-right state-icon mini"></i>
+        <span class="state-sub">Aucun commentaire. Soyez le premier !</span>
+      </div>
+
+      <!-- ── COMMENTS LIST ── -->
+      <div class="comments-list">
+        <div class="comment-block" *ngFor="let c of commentaires">
+
+          <!-- Commentaire parent -->
+          <div class="cmt-row">
+            <div class="cmt-avt"><i class="bi bi-person-fill"></i></div>
+            <div class="cmt-content">
+              <div class="cmt-header">
+                <span class="cmt-author">{{ c.acheteur?.email }}</span>
+                <span class="cmt-date"><i class="bi bi-clock"></i>{{ c.createdAt | date:'dd MMM, HH:mm' }}</span>
+              </div>
+              <p class="cmt-text">{{ c.contenu }}</p>
+              <button class="btn-reply" (click)="c._showReply = !c._showReply">
+                <i class="bi bi-reply-fill"></i> Répondre
+              </button>
+
+              <!-- Zone réponse inline -->
+              <div class="reply-box" *ngIf="c._showReply">
+                <textarea
+                  class="dark-input reply-ta"
+                  [(ngModel)]="c._replyText"
+                  placeholder="Votre réponse…"
+                  rows="2"
+                ></textarea>
+                <div class="reply-box-actions">
+                  <button class="btn-ghost small" (click)="c._showReply = false; c._replyText = ''">Annuler</button>
+                  <button
+                    class="btn-teal small"
+                    [disabled]="!c._replyText?.trim()"
+                    (click)="replyCommentaire(c._id, c._replyText); c._showReply = false; c._replyText = ''"
+                  >
+                    <i class="bi bi-send-fill"></i> Envoyer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── SOUS-COMMENTAIRES (décalés + reliés) ── -->
+          <div class="sub-thread" *ngIf="c.sousCommentaires?.length > 0">
+            <div class="sub-cmt-row" *ngFor="let sc of c.sousCommentaires; let last = last">
+              <!-- Ligne verticale + crochet horizontal -->
+              <div class="thread-connector">
+                <div class="thread-vline" [class.last]="last"></div>
+                <div class="thread-hline"></div>
+              </div>
+              <div class="cmt-avt sm"><i class="bi bi-person-fill"></i></div>
+              <div class="cmt-content">
+                <div class="cmt-header">
+                  <span class="cmt-author">{{ sc.acheteur?.email }}</span>
+                  <span class="cmt-date"><i class="bi bi-clock"></i>{{ sc.createdAt | date:'dd MMM, HH:mm' }}</span>
+                </div>
+                <p class="cmt-text">{{ sc.contenu }}</p>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /comment-block -->
+      </div><!-- /comments-list -->
+
+    </div><!-- /popup-body -->
+  </div><!-- /popup-panel -->
+</div><!-- /popup-backdrop -->

@@ -1,298 +1,249 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .home-container {
   width: 100%;
   height: 100vh;
-  padding: 10px;
   background: #101324;
-  overflow: hidden;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  padding: 16px;
+  gap: 16px;
 }
 
-/* Section Bienvenue */
+/* ─── Section Bienvenue ─── */
 .welcome-section {
-  margin-bottom: 20px;
-  border-radius: 12px;
   flex-shrink: 0;
+}
+
+.welcome-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(50, 188, 174, 0.15);
+  border: 1px solid #32bcae;
+  color: #32bcae;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #32bcae;
 }
 
 .welcome-section h1 {
   color: #ffffff;
-  font-size: 32px;
+  font-size: 40px;
   font-weight: 700;
-  margin: 0 0 5px 0;
+  margin-bottom: 4px;
+}
+
+.username-highlight {
+  color: #32bcae;
 }
 
 .welcome-section p {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  margin: 0;
-}
-
-/* Layout principal */
-.content-wrapper {
-  display: flex;
-  gap: 20px;
-  flex: 1;
-  min-height: 0;
-}
-
-/* Liste des boutiques (gauche) */
-.boutiques-list {
-  flex: 0 0 350px;
-  background: #1a1d2e;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  min-height: 0;
-}
-
-.boutiques-list h2 {
-  color: #ffffff;
-  font-size: 20px;
-  margin: 0 0 15px 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.boutiques-list h2 i {
-  color: #32bcae;
-  font-size: 22px;
-}
-
-/* Barre de recherche */
-.search-box {
-  position: relative;
-  margin-bottom: 15px;
-  flex-shrink: 0;
-}
-
-.search-box i {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #32bcae;
-  font-size: 16px;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 10px 12px 10px 40px;
-  background: #101324;
-  border: 2px solid #13514b;
-  border-radius: 8px;
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 13px;
-  transition: all 0.3s ease;
 }
 
-.search-box input:focus {
-  outline: none;
-  border-color: #32bcae;
-  box-shadow: 0 0 10px rgba(50, 188, 174, 0.3);
-}
-
-.search-box input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-/* Scroll des boutiques */
-.boutiques-scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 8px;
-  min-height: 0;
-}
-
-.boutiques-scroll::-webkit-scrollbar {
-  width: 5px;
-}
-
-.boutiques-scroll::-webkit-scrollbar-track {
-  background: #101324;
-  border-radius: 3px;
-}
-
-.boutiques-scroll::-webkit-scrollbar-thumb {
-  background: #13514b;
-  border-radius: 3px;
-}
-
-.boutiques-scroll::-webkit-scrollbar-thumb:hover {
-  background: #32bcae;
-}
-
-/* Cartes boutiques */
-.boutique-card {
-  display: flex;
-  gap: 12px;
-  padding: 12px;
-  background: #101324;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.boutique-card:hover,
-.boutique-card.hovered {
-  background: #13514b;
-  border-color: #32bcae;
-  transform: translateX(5px);
-}
-
-.boutique-card.highlighted {
-  background: linear-gradient(90deg, #13514b 0%, rgba(19, 81, 75, 0.5) 100%);
-  border-color: #32bcae;
-  box-shadow: 0 0 15px rgba(50, 188, 174, 0.4);
-}
-
-.boutique-marker {
-  flex: 0 0 45px;
-  height: 45px;
-  border-radius: 50%;
+/* ─── Messages loading / error ─── */
+.loading-message,
+.error-message {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  color: #ffffff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.marker-number {
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.boutique-info {
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
   flex: 1;
-  display: flex;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(50, 188, 174, 0.3);
+  border-top-color: #32bcae;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
   flex-direction: column;
-  gap: 4px;
+  color: #ff6b6b;
 }
 
-.boutique-info h3 {
-  color: #ffffff;
-  font-size: 15px;
+.error-message button {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: #32bcae;
+  color: #101324;
+  border: none;
+  border-radius: 8px;
   font-weight: 600;
-  margin: 0;
+  cursor: pointer;
 }
 
-.boutique-info .category {
-  color: #32bcae;
-  font-size: 13px;
+/* ─── Layout principal ─── */
+.content-wrapper {
   display: flex;
-  align-items: center;
-  gap: 5px;
-  margin: 0;
-}
-
-.boutique-info .category i {
-  font-size: 13px;
-}
-
-.boutique-hours {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.boutique-hours i {
-  font-size: 11px;
-}
-
-/* Container de la carte (droite) */
-.map-container {
+  flex-direction: row;          /* carte à gauche, liste à droite */
+  gap: 16px;
   flex: 1;
+  min-height: 0;                /* essentiel pour que flex enfant scroll */
+}
+
+/* ─── Carte (GAUCHE) ─── */
+.map-container {
+  flex: 1;                      /* prend tout l'espace restant */
   background: #1a1d2e;
   border-radius: 12px;
-  padding: 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  gap: 12px;
   min-height: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .map-header {
-  margin-bottom: 15px;
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0;
 }
 
 .map-header h2 {
   color: #ffffff;
-  font-size: 20px;
-  margin: 0;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-header h2 i {
+  color: #32bcae;
+}
+
+.map-header-right {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.map-header h2 i {
-  color: #32bcae;
-  font-size: 22px;
-}
-
 .map-info {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
 }
 
-/* Wrapper de la carte */
+.map-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(50, 188, 174, 0.15);
+  color: #32bcae;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #32bcae;
+}
+
+/* ─── Map wrapper ─── */
 .map-wrapper {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1; /* Force un ratio carré */
-  max-height: 100%;
+  flex: 1;
+  min-height: 0;
   border-radius: 10px;
   overflow: hidden;
   background: #0a0c16;
   border: 2px solid #13514b;
-  margin: 0 auto; /* Centre la carte si nécessaire */
 }
 
 .map-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ou 'contain' selon votre préférence */
+  object-fit: cover;
   display: block;
 }
 
-
-/* Points sur la carte */
+/* ─── Points sur la carte ─── */
 .map-point {
   position: absolute;
-  width: 35px;
-  height: 35px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   transform: translate(-50%, -50%);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  color: #ffffff;
-  font-size: 14px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   z-index: 10;
   border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
-.point-number {
-  position: relative;
-  z-index: 2;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+.point-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.point-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.point-icon-fallback {
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.point-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ffffff;
+  color: #101324;
+  font-size: 9px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.point-pulse {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  pointer-events: none;
 }
 
 .map-point:hover,
@@ -305,44 +256,23 @@
 
 .map-point.active {
   transform: translate(-50%, -50%) scale(1.2);
-  box-shadow: 0 0 0 0 rgba(50, 188, 174, 0.7);
   animation: pulse 2s infinite;
   z-index: 15;
+  border-color: #ffffff;
 }
 
 @keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(50, 188, 174, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 20px rgba(50, 188, 174, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(50, 188, 174, 0);
-  }
-}
-
-.point-pulse {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  opacity: 0.5;
-  animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  0%   { box-shadow: 0 0 0 0 rgba(50, 188, 174, 0.7); }
+  70%  { box-shadow: 0 0 0 16px rgba(50, 188, 174, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(50, 188, 174, 0); }
 }
 
 @keyframes pulse-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(2);
-    opacity: 0;
-  }
+  0%   { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(2); opacity: 0; }
 }
 
-/* Tooltip */
+/* ─── Tooltip ─── */
 .map-tooltip {
   position: absolute;
   transform: translate(10px, -50%);
@@ -352,14 +282,8 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translate(10px, -50%) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(10px, -50%) translateY(0);
-  }
+  from { opacity: 0; transform: translate(10px, -50%) translateY(8px); }
+  to   { opacity: 1; transform: translate(10px, -50%) translateY(0); }
 }
 
 .tooltip-arrow {
@@ -391,16 +315,33 @@
   color: #ffffff;
 }
 
+.tooltip-logo-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.15);
+}
+
+.tooltip-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .tooltip-header i {
   font-size: 20px;
 }
 
 .tooltip-number {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.2);
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -416,41 +357,320 @@
   color: #ffffff;
   font-size: 14px;
   font-weight: 600;
-  margin: 0 0 6px 0;
+  margin-bottom: 5px;
 }
 
 .tooltip-body .category {
   color: #32bcae;
-  font-size: 13px;
-  margin: 0 0 6px 0;
-}
-
-.tooltip-body .hours {
-  color: rgba(255, 255, 255, 0.7);
   font-size: 12px;
   display: flex;
   align-items: center;
   gap: 5px;
-  margin: 0;
+  margin-bottom: 5px;
 }
 
-.tooltip-body .hours i {
+.tooltip-body .hours {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ─── Liste des boutiques (DROITE) ─── */
+.boutiques-list {
+  flex: 0 0 320px;
+  background: #1a1d2e;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.list-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list-header h2 {
+  color: #ffffff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-header h2 i {
+  color: #32bcae;
+}
+
+.boutiques-count {
+  background: rgba(50, 188, 174, 0.15);
+  color: #32bcae;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+  border: 1px solid #32bcae;
+}
+
+/* ─── Search ─── */
+.search-box {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.search-box > i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #32bcae;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 9px 36px 9px 38px;
+  background: #101324;
+  border: 2px solid #13514b;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 13px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #32bcae;
+  box-shadow: 0 0 10px rgba(50, 188, 174, 0.25);
+}
+
+.search-box input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.search-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.search-clear:hover {
+  color: #32bcae;
+}
+
+/* ─── Scroll boutiques ─── */
+.boutiques-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.boutiques-scroll::-webkit-scrollbar        { width: 4px; }
+.boutiques-scroll::-webkit-scrollbar-track  { background: #101324; border-radius: 4px; }
+.boutiques-scroll::-webkit-scrollbar-thumb  { background: #13514b; border-radius: 4px; }
+.boutiques-scroll::-webkit-scrollbar-thumb:hover { background: #32bcae; }
+
+/* ─── Cartes boutique ─── */
+.boutique-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #101324;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, transform 0.25s;
+  flex-shrink: 0;
+}
+
+.boutique-card:hover,
+.boutique-card.hovered {
+  background: #13514b;
+  border-color: #32bcae;
+  transform: translateX(-4px);   /* glisse vers la gauche (coté droit) */
+}
+
+.boutique-card.highlighted {
+  background: linear-gradient(90deg, #13514b 0%, rgba(19, 81, 75, 0.4) 100%);
+  border-color: #32bcae;
+  box-shadow: 0 0 15px rgba(50, 188, 174, 0.35);
+}
+
+/* ─── Marker dans la carte boutique ─── */
+.boutique-marker {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.marker-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.marker-icon-fallback {
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.marker-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ffffff;
+  color: #101324;
+  font-size: 9px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Infos boutique ─── */
+.boutique-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.boutique-info h3 {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boutique-info .category {
+  color: #32bcae;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boutique-hours {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-arrow {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.boutique-card:hover .card-arrow,
+.boutique-card.highlighted .card-arrow {
+  color: #32bcae;
+}
+
+/* ─── No results ─── */
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+}
+
+.no-results-icon {
+  font-size: 32px;
+  color: #13514b;
+}
+
+.no-results p {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.no-results span {
   font-size: 12px;
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .home-container {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
   .content-wrapper {
     flex-direction: column;
   }
-  
+
   .boutiques-list {
     flex: 0 0 auto;
-    max-height: 300px;
+    max-height: 340px;
   }
-  
+
   .map-container {
-    flex: 1;
     min-height: 400px;
+    flex: 0 0 auto;
+  }
+
+  .map-wrapper {
+    height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-container {
+    padding: 10px;
+  }
+
+  .welcome-section h1 {
+    font-size: 22px;
+  }
+
+  .boutiques-list {
+    flex: 0 0 320px;
   }
 }

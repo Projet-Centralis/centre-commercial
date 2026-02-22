@@ -338,6 +338,9 @@ export interface ApiResponse<T> {
   message?: string;
   data?: T;
 }
+import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
+
 
 export interface MouvementStock {
   _id: string;
@@ -612,6 +615,18 @@ getAllMouvements(): Observable<ApiResponse<MouvementStock[]>> {
       case 'alerte': return '#ffd93d';
       default: return '#32bcae';
     }
+
+  private http = inject(HttpClient);
+  private authService = inject(AuthService);
+  private apiUrl = 'http://localhost:5000/api/produits';
+
+  private getHeaders(): HttpHeaders {
+    return this.authService.getAuthHeaders();
+  }
+
+  // GET produit par boutiques
+  getProductsBoutique(boutiqueId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/boutique/${boutiqueId}`, { headers: this.getHeaders() });
   }
 
   getStockStatusText(quantite: number, seuil: number): string {

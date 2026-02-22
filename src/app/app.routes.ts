@@ -89,10 +89,10 @@ import { authGuard } from '../guards/auth.guard';
 import { publicGuard } from '../guards/public.guard';
 
 export const routes: Routes = [
-  { 
-    path: '', 
-    redirectTo: 'auth', 
-    pathMatch: 'full' 
+  {
+    path: '',
+    redirectTo: 'auth',
+    pathMatch: 'full'
   },
   {
     path: 'auth',
@@ -105,45 +105,46 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       // Route accueil pour les ACHETEURS
-      { 
-        path: 'accueil', 
-        loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) 
+      {
+        path: 'accueil',
+        loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent)
       },
-      
+
       // Routes pour les ACHETEURS
-      { 
-        path: 'boutiques', 
-        loadComponent: () => import('./pages/boutiques/boutiques.component').then(m => m.BoutiquesComponent) 
+      {
+        path: 'boutiques',
+        loadComponent: () => import('./pages/boutiques/boutiques.component').then(m => m.BoutiquesComponent)
       },
-      { 
-        path: 'promotions', 
-        loadComponent: () => import('./pages/promotions/promotions.component').then(m => m.PromotionsComponent) 
+      {
+        path: 'promotions',
+        loadComponent: () => import('./pages/promotions/promotions.component').then(m => m.PromotionsComponent)
       },
-      { 
-        path: 'forums', 
-        loadComponent: () => import('./pages/forums/forums.component').then(m => m.ForumsComponent) 
+      {
+        path: 'forums',
+        loadComponent: () => import('./pages/forums/forums.component').then(m => m.ForumsComponent)
       },
-      { 
-        path: 'events', 
-        loadComponent: () => import('./pages/events/events.component').then(m => m.EventsComponent) 
+      {
+        path: 'events',
+        loadComponent: () => import('./pages/events/events.component').then(m => m.EventsComponent)
       },
-      
+
       // Routes pour les BOUTIQUES (sous /boutique/)
       {
         path: 'boutique',
         children: [
-          { 
-            path: 'dashboard', 
-            loadComponent: () => import('./pages/boutique-dashboard/boutique-dashboard.component').then(m => m.BoutiqueDashboardComponent) 
+          {
+            path: 'dashboard',
+            loadComponent: () => import('./pages/boutique-dashboard/boutique-dashboard.component').then(m => m.BoutiqueDashboardComponent)
           },
           {
-            path: 'events', 
-            loadComponent: () => import('./pages/boutique-events/boutique-events.component').then(m => m.BoutiqueEventsComponent) 
+            path: 'events',
+            loadComponent: () => import('./pages/boutique-events/boutique-events.component').then(m => m.BoutiqueEventsComponent)
           },
           {
             path: 'produits', 
             loadComponent: () => import('./pages/boutique-produits/boutique-produits.component').then(m => m.BoutiqueProduitsComponent) 
           },
+<<<<<<< HEAD
           {
             path: 'previsions', 
             loadComponent: () => import('./pages/boutique-prevision/boutique-prevision.component').then(m => m.BoutiquePrevisionComponent)
@@ -157,14 +158,22 @@ export const routes: Routes = [
             path: '', 
             redirectTo: 'dashboard', 
             pathMatch: 'full' 
+=======
+          // ... autres routes boutique
+          {
+            path: '',
+            redirectTo: 'dashboard',
+            pathMatch: 'full'
+>>>>>>> daab0cdd610aec1a0e7f08292ccfc8543c9854b2
           }
         ]
       },
-      
+
       // Routes pour les ADMIN
       {
         path: 'admin',
         children: [
+<<<<<<< HEAD
            {
             path: 'loyers',
             loadComponent: () => import('./pages/admin-loyers/admin-loyers.component').then(m => m.AdminLoyersComponent)
@@ -173,13 +182,26 @@ export const routes: Routes = [
             path: '', 
             redirectTo: 'dashboard', 
             pathMatch: 'full' 
+=======
+          {
+            path: 'dashboard',
+            loadComponent: () => import('./pages/dashboard-admin/dashboard-admin.component').then(m => m.DashboardAdminComponent)
+          },
+          { path: 'loyer', loadComponent: () => import('./pages/loyer-admin/loyer-admin.component').then(m => m.LoyerAdminComponent) },
+          { path: 'events', loadComponent: () => import('./pages/events-admin/events-admin.component').then(m => m.EventsAdminComponent) },
+
+          {
+            path: '',
+            redirectTo: 'dashboard',
+            pathMatch: 'full'
+>>>>>>> daab0cdd610aec1a0e7f08292ccfc8543c9854b2
           }
         ]
       },
     ]
   },
-  { 
-    path: '**', 
-    redirectTo: 'auth' 
+  {
+    path: '**',
+    redirectTo: 'auth'
   }
 ];

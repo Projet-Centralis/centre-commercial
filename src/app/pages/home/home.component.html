@@ -1,14 +1,14 @@
 <div class="home-container">
+
   <!-- Section Bienvenue -->
   <div class="welcome-section">
-    <h1>Bienvenue, {{ userName }}</h1>
-    <p>Découvrez les boutiques de notre centre commercial et trouvez ce que vous
-      cherchez</p>
+    <h1>Bienvenue, <span class="username-highlight">{{ userName }}</span></h1>
+    <p>Découvrez les boutiques de notre centre commercial et trouvez ce que vous cherchez</p>
   </div>
 
   <!-- Message de chargement -->
   <div *ngIf="loading" class="loading-message">
-    <i class="bi bi-hourglass-split"></i>
+    <div class="loading-spinner"></div>
     Chargement des boutiques...
   </div>
 
@@ -20,17 +20,26 @@
   </div>
 
   <div class="content-wrapper" *ngIf="!loading && !error">
+
     <!-- Liste des boutiques à gauche -->
     <div class="boutiques-list">
-      <h2>
-        <i class="bi bi-shop"></i>
-        Nos Boutiques ({{ boutiques.length }})
-      </h2>
+      <div class="list-header">
+        <h2>
+          <i class="bi bi-shop"></i>
+          Nos Boutiques
+        </h2>
+        <span class="boutiques-count">{{ boutiques.length }}</span>
+      </div>
 
       <div class="search-box">
         <i class="bi bi-search"></i>
-        <input type="text" placeholder="Rechercher une boutique..."
+        <input
+          type="text"
+          placeholder="Rechercher une boutique..."
           [(ngModel)]="searchTerm">
+        <span class="search-clear" *ngIf="searchTerm" (click)="searchTerm = ''">
+          <i class="bi bi-x-circle-fill"></i>
+        </span>
       </div>
 
       <div class="boutiques-scroll">
@@ -42,9 +51,23 @@
           (mouseenter)="onBoutiqueHover(boutique)"
           (mouseleave)="onBoutiqueLeave()"
           (click)="selectBoutique(boutique)">
+
+          <!-- Logo / Marker -->
           <div class="boutique-marker" [style.background]="boutique.color">
-            <span class="marker-number">{{ i + 1 }}</span>
+            <img
+              *ngIf="boutique.logo; else iconFallback"
+              [src]="'/' + boutique.logo"
+              [alt]="boutique.nom_boutique"
+              class="marker-logo"
+              (error)="onLogoError($event, boutique)"
+            />
+            <ng-template #iconFallback>
+              <i [class]="boutique.icon" class="marker-icon-fallback"></i>
+            </ng-template>
+            <span class="marker-badge">{{ i + 1 }}</span>
           </div>
+
+          <!-- Infos -->
           <div class="boutique-info">
             <h3>{{ boutique.nom_boutique }}</h3>
             <p class="category">
@@ -56,12 +79,20 @@
               {{ boutique.email_contact }}
             </span>
           </div>
+
+          <!-- Chevron -->
+          <div class="card-arrow">
+            <i class="bi bi-chevron-right"></i>
+          </div>
         </div>
 
         <!-- Message si aucune boutique trouvée -->
         <div *ngIf="filteredBoutiques.length === 0" class="no-results">
-          <i class="bi bi-search"></i>
+          <div class="no-results-icon">
+            <i class="bi bi-search"></i>
+          </div>
           <p>Aucune boutique trouvée</p>
+          <span>Essayez un autre terme de recherche</span>
         </div>
       </div>
     </div>
@@ -73,7 +104,16 @@
           <i class="bi bi-map"></i>
           Plan du Centre
         </h2>
-        <span class="map-info">Cliquez sur les points pour plus d'infos</span>
+        <div class="map-header-right">
+          <span class="map-info">
+            <i class="bi bi-cursor"></i>
+            Survolez les points pour plus d'infos
+          </span>
+          <span class="map-count-badge" *ngIf="selectedBoutique">
+            <i class="bi bi-geo-alt-fill"></i>
+            {{ selectedBoutique.nom_boutique }}
+          </span>
+        </div>
       </div>
 
       <div class="map-wrapper">
@@ -87,11 +127,29 @@
           [class.hovered]="hoveredBoutique?._id === boutique._id"
           [style.left.%]="boutique.x"
           [style.top.%]="boutique.y"
-          [style.background]="boutique.color"
+          [style.--point-color]="boutique.color"
           (mouseenter)="onPointHover(boutique)"
           (mouseleave)="onPointLeave()"
           (click)="selectBoutique(boutique)">
-          <span class="point-number">{{ i + 1 }}</span>
+
+          <!-- Logo sur la carte -->
+          <div class="point-inner" [style.background]="boutique.color">
+            <img
+              *ngIf="boutique.logo; else pointIconFallback"
+              [src]="'/' + boutique.logo"
+              [alt]="boutique.nom_boutique"
+              class="point-logo"
+              (error)="onLogoError($event, boutique)"
+            />
+            <ng-template #pointIconFallback>
+              <i [class]="boutique.icon" class="point-icon-fallback"></i>
+            </ng-template>
+          </div>
+
+          <!-- Numéro badge -->
+          <!-- <span class="point-badge">{{ i + 1 }}</span> -->
+
+          <!-- Pulse ring -->
           <div class="point-pulse" [style.background]="boutique.color"></div>
         </div>
 
@@ -101,18 +159,33 @@
           class="map-tooltip"
           [style.left.%]="getTooltipX(hoveredBoutique.x || 0)"
           [style.top.%]="hoveredBoutique.y">
-          <div class="tooltip-arrow"
-            [style.border-top-color]="hoveredBoutique.color"></div>
+
+          <div class="tooltip-arrow" [style.border-right-color]="hoveredBoutique.color"></div>
+
           <div class="tooltip-content">
-            <div class="tooltip-header"
-              [style.background]="hoveredBoutique.color">
-              <i [class]="hoveredBoutique.icon"></i>
-              <span class="tooltip-number">{{ getBoutiqueIndex(hoveredBoutique)
-                }}</span>
+            <!-- Header avec logo -->
+            <div class="tooltip-header" [style.background]="hoveredBoutique.color">
+              <div class="tooltip-logo-wrap">
+                <img
+                  *ngIf="hoveredBoutique.logo; else tooltipIconFallback"
+                  [src]="'/' + hoveredBoutique.logo"
+                  [alt]="hoveredBoutique.nom_boutique"
+                  class="tooltip-logo"
+                />
+                <ng-template #tooltipIconFallback>
+                  <i [class]="hoveredBoutique.icon"></i>
+                </ng-template>
+              </div>
+              <span class="tooltip-number">{{ getBoutiqueIndex(hoveredBoutique) }}</span>
             </div>
+
+            <!-- Body -->
             <div class="tooltip-body">
               <h4>{{ hoveredBoutique.nom_boutique }}</h4>
-              <p class="category">{{ hoveredBoutique.description }}</p>
+              <p class="category">
+                <i [class]="hoveredBoutique.icon"></i>
+                {{ hoveredBoutique.description }}
+              </p>
               <p class="hours">
                 <i class="bi bi-envelope"></i>
                 {{ hoveredBoutique.email_contact }}
@@ -120,7 +193,9 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
+
   </div>
 </div>

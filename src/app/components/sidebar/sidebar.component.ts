@@ -1,21 +1,8 @@
-// import { Component } from '@angular/core';
-// import { RouterModule } from '@angular/router';
-
-// @Component({
-//   selector: 'app-sidebar',
-//   standalone: true,
-//   imports: [RouterModule],
-//   templateUrl: './sidebar.component.html',
-//   styleUrl: './sidebar.component.css'
-// })
-// export class SidebarComponent {
-
-// }
-
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sidebar',
@@ -24,16 +11,12 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent implements OnInit {
-  userType: string = '';
-  isBoutique: boolean = false;
+export class SidebarComponent {
 
-  constructor(private authService: AuthService) {}
+  // Observable du type user
+  userType$ = this.authService.currentUser$.pipe(
+    map(user => user?.type_user ?? null)
+  );
 
-  ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
-      this.userType = user?.type_user || '';
-      this.isBoutique = this.userType === 'BOUTIQUE';
-    });
-  }
+  constructor(public authService: AuthService) {}
 }
