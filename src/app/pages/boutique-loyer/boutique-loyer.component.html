@@ -1,0 +1,527 @@
+<div class="loyer-container">
+  <!-- Header -->
+  <div class="loyer-header">
+    <div class="header-left">
+      <h1>
+        <i class="bi bi-building"></i>
+        Gestion des Loyers
+      </h1>
+      <p class="subtitle">Gérez vos contrats de location et suivez vos paiements</p>
+    </div>
+    <div class="header-right">
+      <button class="refresh-btn" (click)="loadAllData()" [disabled]="isLoading">
+        <i class="bi" [class.bi-arrow-clockwise]="!isLoading" [class.bi-hourglass-split]="isLoading"></i>
+        {{ isLoading ? 'Chargement...' : 'Actualiser' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage" class="success-message">
+    <i class="bi bi-check-circle"></i>
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="bi bi-exclamation-triangle"></i>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loader"></div>
+    <p>Chargement des données...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="loyer-content">
+    <!-- Statistiques -->
+    <div class="stats-grid" *ngIf="statistiques">
+      <div class="stat-card">
+        <div class="stat-icon total">
+          <i class="bi bi-cash-stack"></i>
+        </div>
+        <div class="stat-content">
+          <h3>Total payé</h3>
+          <div class="stat-value">{{ formatMontant(statistiques.totalPaye) }}</div>
+          <div class="stat-trend">
+            <i class="bi bi-arrow-up-circle-fill"></i>
+            <span>Tous les paiements</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon pending">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+        <div class="stat-content">
+          <h3>En attente</h3>
+          <div class="stat-value">{{ formatMontant(statistiques.totalAttente) }}</div>
+          <div class="stat-trend">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>À payer</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon alert">
+          <i class="bi bi-exclamation-circle"></i>
+        </div>
+        <div class="stat-content">
+          <h3>Paiements en retard</h3>
+          <div class="stat-value">{{ statistiques.paiementsEnRetard }}</div>
+          <div class="stat-trend" [style.color]="statistiques.paiementsEnRetard > 0 ? '#ff6b6b' : '#32bcae'">
+            <i class="bi" [class.bi-exclamation-circle-fill]="statistiques.paiementsEnRetard > 0"></i>
+            <span>{{ statistiques.paiementsEnRetard > 0 ? 'Action requise' : 'Aucun retard' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon progress">
+          <i class="bi bi-graph-up"></i>
+        </div>
+        <div class="stat-content">
+          <h3>Progression</h3>
+          <div class="stat-value">{{ getProgressionPaiements() }}%</div>
+          <div class="progress-bar-mini">
+            <div class="progress-fill" [style.width.%]="getProgressionPaiements()" [style.background]="getProgressionPaiements() >= 70 ? '#32bcae' : '#ffd93d'"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucun contrat actif -->
+    <div class="no-contrat-card" *ngIf="!contratActif && !isLoading">
+      <div class="no-contrat-content">
+        <i class="bi bi-file-text"></i>
+        <h3>Aucun contrat actif</h3>
+        <p>Vous n'avez pas de contrat de location actif. Contactez l'administrateur.</p>
+      </div>
+    </div>
+
+    <!-- Contrat actif -->
+    <div class="contrat-actif-card" *ngIf="contratActif">
+      <div class="contrat-actif-header">
+        <h3>
+          <i class="bi bi-file-text"></i>
+          Contrat actif - {{ nomBoutique }}
+        </h3>
+        <span class="badge actif">ACTIF</span>
+      </div>
+      <div class="contrat-actif-details">
+        <div class="detail-item">
+          <span class="label">Montant mensuel</span>
+          <span class="value">{{ formatMontant(contratActif.montant_mensuel) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Jour d'échéance</span>
+          <span class="value">le {{ contratActif.jour_echeance }} de chaque mois</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Période</span>
+          <span class="value">{{ formatDate(contratActif.date_debut) }} - {{ formatDate(contratActif.date_fin) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Prochain paiement</span>
+          <span class="value" [style.color]="getJoursRestantColor(getJoursRestant())">
+            {{ getJoursRestantText(getJoursRestant()) }}
+          </span>
+        </div>
+      </div>
+      <div class="contrat-actif-actions">
+        <button class="action-btn primary" (click)="openCreatePaiementModal()">
+          <i class="bi bi-plus-circle"></i>
+          Enregistrer un paiement
+        </button>
+      </div>
+    </div>
+
+    <!-- Résumé annuel -->
+<div class="resume-annuel" *ngIf="contratActif">
+  <div class="resume-header">
+    <h3>
+      <i class="bi bi-calendar-year"></i>
+      Résumé annuel
+    </h3>
+  </div>
+  <div class="resume-grid">
+    <div class="resume-item">
+      <span class="label">Montant annuel</span>
+      <span class="value">{{ formatMontant(contratActif.montant_mensuel * 12) }}</span>
+    </div>
+    <div class="resume-item">
+      <span class="label">Mois payés</span>
+      <span class="value">{{ getMoisPayes() }} / 12</span>
+    </div>
+    <div class="resume-item">
+      <span class="label">Mois restants</span>
+      <span class="value">{{ getMoisRestants() }}</span>
+    </div>
+    <div class="resume-item">
+      <span class="label">Progression</span>
+      <div class="progress-bar-small">
+        <div class="progress-fill" [style.width.%]="getProgressionAnnuelle()"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Onglets -->
+    <div class="tabs">
+      <button class="tab-btn" [class.active]="ongletActif === 'tableau'" (click)="ongletActif = 'tableau'">
+        <i class="bi bi-speedometer2"></i>
+        Tableau de bord
+      </button>
+      <button class="tab-btn" [class.active]="ongletActif === 'historique'" (click)="ongletActif = 'historique'">
+        <i class="bi bi-clock-history"></i>
+        Historique des paiements
+      </button>
+      <button class="tab-btn" [class.active]="ongletActif === 'contrats'" (click)="ongletActif = 'contrats'">
+        <i class="bi bi-file-text"></i>
+        Contrats
+      </button>
+    </div>
+
+    <!-- Tableau de bord -->
+    <div *ngIf="ongletActif === 'tableau'" class="dashboard-tab">
+      <!-- Échéances à venir -->
+      <div class="echeances-card" *ngIf="echeances.length > 0">
+        <div class="card-header">
+          <h3>
+            <i class="bi bi-calendar-event"></i>
+            Échéances à venir
+          </h3>
+        </div>
+        <div class="echeances-list">
+          <div *ngFor="let echeance of echeances" class="echeance-item">
+            <div class="echeance-info">
+              <h4>{{ echeance.boutique?.nom_boutique || 'Boutique' }}</h4>
+              <span class="montant">{{ formatMontant(echeance.montant) }}</span>
+            </div>
+            <div class="echeance-date" [style.color]="getJoursRestantColor(echeance.jours_restants)">
+              <i class="bi bi-calendar"></i>
+              {{ formatDate(echeance.date_echeance) }}
+              <span class="jours-restant">({{ getJoursRestantText(echeance.jours_restants) }})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique historique -->
+      <div class="historique-card" *ngIf="statistiques && statistiques.historiqueMensuel.length > 0">
+        <div class="card-header">
+          <h3>
+            <i class="bi bi-bar-chart"></i>
+            Historique des paiements (12 derniers mois)
+          </h3>
+        </div>
+        <div class="historique-chart">
+          <div *ngFor="let item of statistiques.historiqueMensuel" class="chart-bar-container">
+            <div class="chart-bar" [style.height.px]="(item.total / getMaxHistorique()) * 100">
+              <span class="chart-value">{{ formatMontant(item.total) }}</span>
+            </div>
+            <span class="chart-label">{{ getMoisLabel(item._id.mois) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique des paiements -->
+    <div *ngIf="ongletActif === 'historique'" class="historique-tab">
+      <!-- Bouton d'ajout de paiement -->
+      <div class="historique-actions" *ngIf="contratActif">
+        <button class="create-btn" (click)="openCreatePaiementModal()">
+          <i class="bi bi-plus-circle"></i>
+          Enregistrer un nouveau paiement
+        </button>
+      </div>
+
+      <!-- Filtres -->
+      <div class="filters-section">
+        <div class="search-bar">
+          <i class="bi bi-search"></i>
+          <input 
+            type="text" 
+            [(ngModel)]="filtreRecherche" 
+            (input)="getPaiementsFiltres()"
+            placeholder="Rechercher une boutique ou un mois...">
+        </div>
+        <div class="filter-group">
+          <select [(ngModel)]="filtreStatut" (change)="getPaiementsFiltres()" class="filter-select">
+            <option value="tous">Tous les statuts</option>
+            <option value="paye">Payés</option>
+            <option value="en_attente">En attente</option>
+            <option value="retard">En retard</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Liste des paiements -->
+      <div class="paiements-list">
+        <div *ngFor="let paiement of getPaiementsFiltres()" class="paiement-card">
+          <div class="paiement-header">
+            <div class="paiement-boutique">
+              <h4>{{ getNomBoutique(paiement.boutique) }}</h4>
+              <span class="paiement-mois">{{ formatMois(paiement.mois) }}</span>
+            </div>
+            <div class="paiement-statut" [style.background]="getStatutColor(paiement.statut)">
+              {{ getStatutText(paiement.statut) }}
+            </div>
+          </div>
+
+          <div class="paiement-details">
+            <div class="detail-row">
+              <span class="label">Montant dû:</span>
+              <span class="value">{{ formatMontant(paiement.montant_du) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Montant payé:</span>
+              <span class="value">{{ formatMontant(paiement.montant_paye) }}</span>
+            </div>
+            <div class="detail-row" *ngIf="paiement.montant_paye > paiement.montant_du">
+              <span class="label">Rappel:</span>
+              <span class="value positive">{{ formatMontant(paiement.montant_paye - paiement.montant_du) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Date de paiement:</span>
+              <span class="value">{{ formatDate(paiement.createdAt || '') }}</span>
+            </div>
+          </div>
+
+          <div class="paiement-actions">
+            <button class="action-btn" (click)="openFactureModal(paiement)" title="Voir facture">
+              <i class="bi bi-file-pdf"></i>
+            </button>
+            <button class="action-btn edit" (click)="openEditPaiementModal(paiement)" title="Modifier">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="action-btn delete" (click)="deletePaiement(paiement)" title="Supprimer">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="getPaiementsFiltres().length === 0" class="empty-state">
+          <i class="bi bi-cash"></i>
+          <p>Aucun paiement trouvé</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contrats -->
+    <div *ngIf="ongletActif === 'contrats'" class="contrats-tab">
+      <div class="contrats-header">
+        <h3>Liste des contrats</h3>
+        <button class="create-btn" (click)="openCreateContratModal()">
+          <i class="bi bi-plus-circle"></i>
+          Nouveau contrat
+        </button>
+      </div>
+      
+      <div class="contrats-list">
+        <div *ngFor="let contrat of contrats" class="contrat-card" [class.inactif]="!contrat.is_active">
+          <div class="contrat-header">
+            <h4>{{ getNomBoutique(contrat.boutique) }}</h4>
+            <span class="contrat-statut" [style.background]="contrat.is_active ? '#32bcae' : '#13514b'">
+              {{ contrat.is_active ? 'ACTIF' : 'INACTIF' }}
+            </span>
+          </div>
+
+          <div class="contrat-details">
+            <div class="detail-row">
+              <span class="label">Montant mensuel:</span>
+              <span class="value">{{ formatMontant(contrat.montant_mensuel) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Échéance:</span>
+              <span class="value">le {{ contrat.jour_echeance }} de chaque mois</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Période:</span>
+              <span class="value">{{ formatDate(contrat.date_debut) }} - {{ formatDate(contrat.date_fin) }}</span>
+            </div>
+          </div>
+
+          <div class="contrat-actions">
+            <button class="action-btn" (click)="openCreatePaiementForContrat(contrat)" title="Enregistrer un paiement" *ngIf="contrat.is_active">
+              <i class="bi bi-cash"></i>
+            </button>
+            <button class="action-btn edit" (click)="openEditContratModal(contrat)" title="Modifier">
+              <i class="bi bi-pencil"></i>
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="contrats.length === 0" class="empty-state">
+          <i class="bi bi-file-text"></i>
+          <p>Aucun contrat trouvé</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Paiement -->
+  <div *ngIf="showPaiementModal" class="modal-overlay" (click)="closePaiementModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <i class="bi bi-cash"></i>
+          {{ isEditing ? 'Modifier le paiement' : 'Nouveau paiement' }}
+        </h2>
+        <button class="modal-close" (click)="closePaiementModal()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="submitPaiement()" class="modal-form">
+        <div class="form-group">
+          <label>Mois concerné *</label>
+          <input type="month" [(ngModel)]="paiementForm.mois" name="mois" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Montant dû (€) *</label>
+            <input type="number" [(ngModel)]="paiementForm.montant_du" name="montant_du" min="0" step="0.01" required>
+          </div>
+
+          <div class="form-group">
+            <label>Montant payé (€) *</label>
+            <input type="number" [(ngModel)]="paiementForm.montant_paye" name="montant_paye" min="0" step="0.01" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Statut</label>
+          <select [(ngModel)]="paiementForm.statut" name="statut" class="filter-select">
+            <option value="en_attente">En attente</option>
+            <option value="paye">Payé</option>
+            <option value="retard">En retard</option>
+          </select>
+        </div>
+
+        <div *ngIf="errorMessage" class="form-error">
+          <i class="bi bi-exclamation-circle"></i>
+          {{ errorMessage }}
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closePaiementModal()">Annuler</button>
+          <button type="submit" class="submit-btn" [disabled]="isLoading">
+            <span *ngIf="!isLoading">
+              <i class="bi bi-check-circle"></i>
+              {{ isEditing ? 'Mettre à jour' : 'Enregistrer' }}
+            </span>
+            <span *ngIf="isLoading">
+              <i class="bi bi-arrow-clockwise spin"></i>
+              Traitement...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Facture -->
+  <div *ngIf="showFactureModal && paiementSelectionne" class="modal-overlay" (click)="closeFactureModal()">
+    <div class="modal-content small" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <i class="bi bi-file-pdf"></i>
+          Facture de loyer
+        </h2>
+        <button class="modal-close" (click)="closeFactureModal()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+
+      <div class="facture-preview">
+        <div class="facture-info">
+          <p><strong>Boutique:</strong> {{ getNomBoutique(paiementSelectionne.boutique) }}</p>
+          <p><strong>Mois:</strong> {{ formatMois(paiementSelectionne.mois) }}</p>
+          <p><strong>Montant:</strong> {{ formatMontant(paiementSelectionne.montant_paye) }}</p>
+          <p><strong>Statut:</strong> {{ getStatutText(paiementSelectionne.statut) }}</p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="closeFactureModal()">Fermer</button>
+        <button class="submit-btn" (click)="telechargerFacture()">
+          <i class="bi bi-download"></i>
+          Télécharger PDF
+        </button>
+        <button class="submit-btn" (click)="imprimerFacture()">
+          <i class="bi bi-printer"></i>
+          Imprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Contrat -->
+  <div *ngIf="showContratModal" class="modal-overlay" (click)="closeContratModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <i class="bi bi-file-text"></i>
+          {{ isEditing ? 'Modifier le contrat' : 'Nouveau contrat' }}
+        </h2>
+        <button class="modal-close" (click)="closeContratModal()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="submitContrat()" class="modal-form">
+        <div class="form-group">
+          <label>Montant mensuel (€) *</label>
+          <input type="number" [(ngModel)]="contratForm.montant_mensuel" name="montant_mensuel" min="0" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label>Jour d'échéance *</label>
+          <input type="number" [(ngModel)]="contratForm.jour_echeance" name="jour_echeance" min="1" max="31" required>
+          <small style="color: rgba(255,255,255,0.5);">Jour du mois (1-31)</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date de début *</label>
+            <input type="date" [(ngModel)]="contratForm.date_debut" name="date_debut" required>
+          </div>
+
+          <div class="form-group">
+            <label>Date de fin *</label>
+            <input type="date" [(ngModel)]="contratForm.date_fin" name="date_fin" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="contratForm.is_active" name="is_active">
+            Contrat actif
+          </label>
+        </div>
+
+        <div *ngIf="errorMessage" class="form-error">
+          <i class="bi bi-exclamation-circle"></i>
+          {{ errorMessage }}
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeContratModal()">Annuler</button>
+          <button type="submit" class="submit-btn" [disabled]="isLoading">
+            <span *ngIf="!isLoading">
+              <i class="bi bi-check-circle"></i>
+              {{ isEditing ? 'Mettre à jour' : 'Créer' }}
+            </span>
+            <span *ngIf="isLoading">
+              <i class="bi bi-arrow-clockwise spin"></i>
+              Traitement...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

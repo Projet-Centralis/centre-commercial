@@ -79,64 +79,105 @@
   <!-- Graphique et produits populaires -->
   <div class="content-grid">
     <!-- Graphique des ventes -->
-    <div class="chart-card">
-      <div class="card-header">
-        <h3>
-          <i class="bi bi-graph-up"></i>
-          Ventes de la semaine
-        </h3>
-        <select class="period-select">
-          <option>7 derniers jours</option>
-          <option>30 derniers jours</option>
-          <option>3 derniers mois</option>
-        </select>
-      </div>
-      <div class="chart-container">
-        <div class="chart-bars">
-          <div *ngFor="let vente of ventesJournalieres" class="chart-bar-group">
-            <div class="bar-container">
-              <div 
-                class="bar" 
-                [style.height.%]="getBarHeight(vente.montant)"
-                [style.background]="vente.montant === getVentesMax() ? '#32bcae' : '#13514b'">
-              </div>
-            </div>
-            <div class="bar-label">
-              <span class="day">{{ vente.date }}</span>
-              <span class="amount">{{ formatCurrency(vente.montant) }}</span>
-              <span class="count">{{ vente.nombreVentes }} ventes</span>
-            </div>
+<div class="chart-card">
+  <div class="card-header">
+    <h3>
+      <i class="bi bi-graph-up"></i>
+      Ventes de la semaine
+    </h3>
+    <select class="period-select">
+      <option>7 derniers jours</option>
+      <option>30 derniers jours</option>
+      <option>3 derniers mois</option>
+    </select>
+  </div>
+  
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="chart-loading">
+    <div class="loader"></div>
+    <p>Chargement des données...</p>
+  </div>
+  
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && !hasVentesJournalieres()" class="chart-empty">
+    <i class="bi bi-bar-chart"></i>
+    <p>Aucune donnée de vente pour cette période</p>
+  </div>
+  
+  <!-- Graphique -->
+  <div *ngIf="!isLoading && hasVentesJournalieres()" class="chart-container">
+    <div class="chart-bars">
+      <div *ngFor="let vente of ventesJournalieres" class="chart-bar-group">
+        <div class="bar-container">
+          <div 
+            class="bar" 
+            [style.height.%]="getBarHeight(vente.montant)"
+            [style.background]="vente.montant === ventesMax ? '#32bcae' : '#13514b'"
+            [style.opacity]="vente.montant === 0 ? '0.3' : '1'">
           </div>
+          <span class="bar-value" *ngIf="vente.montant > 0">
+            {{ formatCurrency(vente.montant) }}
+          </span>
+        </div>
+        <div class="bar-label">
+          <span class="day">{{ vente.date }}</span>
+          <span class="amount">{{ formatCurrency(vente.montant) }}</span>
+          <span class="count">{{ vente.nombreVentes }} vente{{ vente.nombreVentes > 1 ? 's' : '' }}</span>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- Produits populaires -->
-    <div class="products-card">
-      <div class="card-header">
-        <h3>
-          <i class="bi bi-trophy"></i>
-          Produits les plus vendus
-        </h3>
-        <a routerLink="/boutique/produits" class="view-all">Voir tout</a>
+<!-- Produits populaires -->
+<div class="products-card">
+  <div class="card-header">
+    <h3>
+      <i class="bi bi-trophy"></i>
+      Produits les plus vendus
+    </h3>
+    <a routerLink="/boutique/produits" class="view-all">Voir tout</a>
+  </div>
+  
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="products-loading">
+    <div class="loader"></div>
+    <p>Chargement des produits...</p>
+  </div>
+  
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && produitsPopulaires.length === 0" class="products-empty">
+    <i class="bi bi-box"></i>
+    <p>Aucun produit vendu pour le moment</p>
+  </div>
+  
+  <!-- Liste des produits -->
+  <div *ngIf="!isLoading && produitsPopulaires.length > 0" class="products-list">
+    <div *ngFor="let produit of produitsPopulaires; let i = index" class="product-item">
+      <div class="product-rank" [class.top]="i === 0">{{ i + 1 }}</div>
+      <div class="product-info">
+        <h4>{{ produit.nom }}</h4>
+        <span class="product-category">
+          <i class="bi bi-tag"></i>
+          {{ produit.categorie }}
+        </span>
       </div>
-      <div class="products-list">
-        <div *ngFor="let produit of produitsPopulaires" class="product-item">
-          <div class="product-rank">{{ produitsPopulaires.indexOf(produit) + 1 }}</div>
-          <div class="product-info">
-            <h4>{{ produit.nom }}</h4>
-            <span class="product-category">{{ produit.categorie }}</span>
-          </div>
-          <div class="product-stats">
-            <div class="sales-count">{{ produit.ventes }} ventes</div>
-            <div class="revenue">{{ formatCurrency(produit.revenu) }}</div>
-          </div>
-          <div class="product-trend" [style.color]="getTendanceColor(produit.tendance)">
-            <i [class]="getTendanceIcon(produit.tendance)"></i>
-          </div>
+      <div class="product-stats">
+        <div class="sales-count">
+          <i class="bi bi-cart"></i>
+          {{ produit.ventes }} vente{{ produit.ventes > 1 ? 's' : '' }}
+        </div>
+        <div class="revenue">
+          <i class="bi bi-currency-euro"></i>
+          {{ formatCurrency(produit.revenu) }}
         </div>
       </div>
+      <div class="product-trend" [style.color]="getTendanceColor(produit.tendance)">
+        <i [class]="getTendanceIcon(produit.tendance)"></i>
+      </div>
     </div>
+  </div>
+</div>
   </div>
 
   <!-- Prospects clients -->

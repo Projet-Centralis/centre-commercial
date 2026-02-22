@@ -753,6 +753,28 @@
 .success-message i {
   font-size: 18px;
 }
+/* Ajoutez dans boutique-produits.component.css */
+.historique-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #13514b;
+  border: 2px solid #32bcae;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.historique-btn:hover {
+  background: #32bcae;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(50, 188, 174, 0.4);
+}
 
 /* Responsive */
 @media (max-width: 768px) {

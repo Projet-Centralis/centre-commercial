@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProduitService, Produit, Categorie, CreateProduitDto, ApiResponse } from '../../services/produit.service';
-
+import { ProduitService, Produit, Categorie, CreateProduitDto, ApiResponse, Emplacement } from '../../services/produit.service';
+import { HistoriqueStockComponent } from '../../components/historique-stocck/historique-stock.component';
 @Component({
   selector: 'app-boutique-produits',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HistoriqueStockComponent],
   templateUrl: './boutique-produits.component.html',
   styleUrls: ['./boutique-produits.component.css']
 })
@@ -50,16 +50,31 @@ export class BoutiqueProduitsComponent implements OnInit {
   stockForm = {
     operation: 'entree' as 'entree' | 'sortie',
     quantite: 0,
-    emplacement: ''
+   emplacement: ''
   };
-
+   emplacements: Emplacement[] = [];
   constructor(private produitService: ProduitService) {}
 
   ngOnInit(): void {
     this.loadProduits();
     this.loadCategories();
+    this.loadEmplacements();
   }
 
+  // Ajoutez cette méthode
+loadEmplacements(): void {
+  this.produitService.getEmplacements().subscribe({
+    next: (response: ApiResponse<Emplacement[]>) => {
+      if (response.success && response.data) {
+        this.emplacements = response.data;
+        console.log('Emplacements chargés:', this.emplacements);
+      }
+    },
+    error: (error) => {
+      console.error('Erreur chargement emplacements:', error);
+    }
+  });
+}
   loadProduits(): void {
     this.loading = true;
     this.errorMessage = '';
@@ -82,6 +97,17 @@ export class BoutiqueProduitsComponent implements OnInit {
       }
     });
   }
+// Ajoutez cette propriété
+selectedProduitHistorique: Produit | null = null;
+
+// Ajoutez ces méthodes
+showHistorique(produit: Produit): void {
+  this.selectedProduitHistorique = produit;
+}
+
+closeHistorique(): void {
+  this.selectedProduitHistorique = null;
+}
  // Méthodes utilitaires pour extraire les noms des objets populés
   getProduitNom(produit: any): string {
     if (typeof produit === 'string') {
@@ -522,4 +548,6 @@ openEditModal(produit: Produit): void {
   getRupturesCount(): number {
     return this.produits.filter(p => p.quantite_stock === 0).length;
   }
+
+  
 }

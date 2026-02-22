@@ -226,6 +226,10 @@
             <i class="bi bi-plus-slash-minus"></i>
             Gérer le stock
           </button>
+           <button class="historique-btn" (click)="showHistorique(produit)">
+            <i class="bi bi-clock-history"></i>
+            Historique
+          </button>
           
           <div class="event-created">
             <i class="bi bi-calendar-plus"></i>
@@ -234,6 +238,13 @@
         </div>
       </div>
     </div>
+    <app-historique-stock 
+          *ngIf="selectedProduitHistorique"
+          [produitId]="selectedProduitHistorique._id"
+          [produitNom]="selectedProduitHistorique.nom_produit"
+          [showHistorique]="true"
+          (closeModal)="closeHistorique()">
+        </app-historique-stock>
   </div>
 
   <!-- Modal de création/édition produit -->
@@ -433,7 +444,7 @@
             required>
         </div>
         
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="stockEmplacement">
             <i class="bi bi-geo-alt"></i>
             Emplacement *
@@ -445,7 +456,28 @@
             name="emplacement"
             placeholder="Ex: Entrepôt principal, Rayon A..."
             required>
-        </div>
+        </div> -->
+        <!-- Modal de gestion stock - remplacez l'input text par un select -->
+<div class="form-group">
+  <label for="stockEmplacement">
+    <i class="bi bi-geo-alt"></i>
+    Emplacement *
+  </label>
+  <select 
+    id="stockEmplacement"
+    [(ngModel)]="stockForm.emplacement"
+    name="emplacement"
+    required
+    class="filter-select">
+    <option value="">Sélectionnez un emplacement</option>
+    <option *ngFor="let emp of emplacements" [value]="emp._id">
+      {{ emp.nom_emplacement }} 
+    </option>
+  </select>
+  <small *ngIf="emplacements.length === 0" style="color: #ffd93d;">
+    Aucun emplacement disponible. Créez d'abord des emplacements.
+  </small>
+</div>
         
         <div *ngIf="errorMessage" class="form-error">
           <i class="bi bi-exclamation-circle"></i>

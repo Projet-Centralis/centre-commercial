@@ -144,7 +144,15 @@ export const routes: Routes = [
             path: 'produits', 
             loadComponent: () => import('./pages/boutique-produits/boutique-produits.component').then(m => m.BoutiqueProduitsComponent) 
           },
-          // ... autres routes boutique
+          {
+            path: 'previsions', 
+            loadComponent: () => import('./pages/boutique-prevision/boutique-prevision.component').then(m => m.BoutiquePrevisionComponent)
+          },
+          {
+            path: 'loyers',
+            loadComponent: () => import('./pages/boutique-loyer/boutique-loyer.component').then(m => m.BoutiqueLoyerComponent)
+          },
+    
           { 
             path: '', 
             redirectTo: 'dashboard', 
@@ -154,20 +162,20 @@ export const routes: Routes = [
       },
       
       // Routes pour les ADMIN
-      // {
-      //   path: 'admin',
-      //   children: [
-      //     { 
-      //       path: 'dashboard', 
-      //       loadComponent: () => import('./pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) 
-      //     },
-      //     { 
-      //       path: '', 
-      //       redirectTo: 'dashboard', 
-      //       pathMatch: 'full' 
-      //     }
-      //   ]
-      // },
+      {
+        path: 'admin',
+        children: [
+           {
+            path: 'loyers',
+            loadComponent: () => import('./pages/admin-loyers/admin-loyers.component').then(m => m.AdminLoyersComponent)
+          },
+          { 
+            path: '', 
+            redirectTo: 'dashboard', 
+            pathMatch: 'full' 
+          }
+        ]
+      },
     ]
   },
   { 
