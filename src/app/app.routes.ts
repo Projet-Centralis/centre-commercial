@@ -144,11 +144,27 @@ export const routes: Routes = [
             path: 'produits', 
             loadComponent: () => import('./pages/boutique-produits/boutique-produits.component').then(m => m.BoutiqueProduitsComponent) 
           },
+<<<<<<< HEAD
+          {
+            path: 'previsions', 
+            loadComponent: () => import('./pages/boutique-prevision/boutique-prevision.component').then(m => m.BoutiquePrevisionComponent)
+          },
+          {
+            path: 'loyers',
+            loadComponent: () => import('./pages/boutique-loyer/boutique-loyer.component').then(m => m.BoutiqueLoyerComponent)
+          },
+    
+          { 
+            path: '', 
+            redirectTo: 'dashboard', 
+            pathMatch: 'full' 
+=======
           // ... autres routes boutique
           {
             path: '',
             redirectTo: 'dashboard',
             pathMatch: 'full'
+>>>>>>> daab0cdd610aec1a0e7f08292ccfc8543c9854b2
           }
         ]
       },
@@ -157,6 +173,16 @@ export const routes: Routes = [
       {
         path: 'admin',
         children: [
+<<<<<<< HEAD
+           {
+            path: 'loyers',
+            loadComponent: () => import('./pages/admin-loyers/admin-loyers.component').then(m => m.AdminLoyersComponent)
+          },
+          { 
+            path: '', 
+            redirectTo: 'dashboard', 
+            pathMatch: 'full' 
+=======
           {
             path: 'dashboard',
             loadComponent: () => import('./pages/dashboard-admin/dashboard-admin.component').then(m => m.DashboardAdminComponent)
@@ -168,6 +194,7 @@ export const routes: Routes = [
             path: '',
             redirectTo: 'dashboard',
             pathMatch: 'full'
+>>>>>>> daab0cdd610aec1a0e7f08292ccfc8543c9854b2
           }
         ]
       },

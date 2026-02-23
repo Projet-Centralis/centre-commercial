@@ -295,7 +295,7 @@ export interface Categorie {
 export interface Stock {
   _id: string;
   produit: string | Produit | { _id: string; nom_produit: string };
-  emplacement: string | Emplacement | { _id: string; nom: string; description?: string };
+  emplacement: string | Emplacement | { _id: string; nom_emplacement: string; description?: string };
   quantite: number;
   date_derniere_entree?: string;
   date_deriere_sortie?: string;
@@ -305,11 +305,9 @@ export interface Stock {
 
 export interface Emplacement {
   _id: string;
-  nom: string;
+  nom_emplacement: string;
   description?: string;
   boutique: string;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
 export interface CreateProduitDto {
@@ -343,6 +341,21 @@ export interface ApiResponse<T> {
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
+
+export interface MouvementStock {
+  _id: string;
+  produit: string | Produit;
+  emplacement: string | Emplacement;
+  type_mouvement: 'entree' | 'sortie' | 'ajustement';
+  quantite: number;
+  quantite_avant: number;
+  quantite_apres: number;
+  motif: string;
+  utilisateur: string | any;
+  date_mouvement: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -439,20 +452,57 @@ export class ProduitService {
     );
   }
 
-  // ========== EMPLACEMENTS ==========
-  getEmplacements(): Observable<ApiResponse<Emplacement[]>> {
-    return this.http.get<ApiResponse<Emplacement[]>>(this.emplacementsUrl).pipe(
-      catchError(error => {
-        console.error('Erreur récupération emplacements:', error);
-        return of({
-          success: false,
-          message: error.error?.message || 'Erreur de connexion',
-          data: []
-        });
-      })
-    );
-  }
+  // Ajoutez cette méthode dans la classe ProduitService
 
+// ========== EMPLACEMENTS ==========
+getEmplacements(): Observable<ApiResponse<Emplacement[]>> {
+  return this.http.get<ApiResponse<Emplacement[]>>(`${this.emplacementsUrl}/boutique`).pipe(
+    catchError(error => {
+      console.error('Erreur récupération emplacements:', error);
+      return of({
+        success: false,
+        message: error.error?.message || 'Erreur de connexion',
+        data: []
+      });
+    })
+  );
+}
+
+createEmplacement(emplacementData: Partial<Emplacement>): Observable<ApiResponse<Emplacement>> {
+  return this.http.post<ApiResponse<Emplacement>>(this.emplacementsUrl, emplacementData).pipe(
+    catchError(error => {
+      console.error('Erreur création emplacement:', error);
+      return of({
+        success: false,
+        message: error.error?.message || 'Erreur lors de la création'
+      });
+    })
+  );
+}
+
+updateEmplacement(id: string, emplacementData: Partial<Emplacement>): Observable<ApiResponse<Emplacement>> {
+  return this.http.put<ApiResponse<Emplacement>>(`${this.emplacementsUrl}/${id}`, emplacementData).pipe(
+    catchError(error => {
+      console.error('Erreur mise à jour emplacement:', error);
+      return of({
+        success: false,
+        message: error.error?.message || 'Erreur lors de la mise à jour'
+      });
+    })
+  );
+}
+
+deleteEmplacement(id: string): Observable<ApiResponse<void>> {
+  return this.http.delete<ApiResponse<void>>(`${this.emplacementsUrl}/${id}`).pipe(
+    catchError(error => {
+      console.error('Erreur suppression emplacement:', error);
+      return of({
+        success: false,
+        message: error.error?.message || 'Erreur lors de la suppression'
+      });
+    })
+  );
+}
   // ========== STOCKS ==========
   getStocksProduit(produitId: string): Observable<ApiResponse<Stock[]>> {
     return this.http.get<ApiResponse<Stock[]>>(`${this.stocksUrl}/produit/${produitId}`).pipe(
@@ -502,6 +552,33 @@ export class ProduitService {
       })
     );
   }
+
+// ========== MOUVEMENTS DE STOCK ==========
+getMouvementsProduit(produitId: string): Observable<ApiResponse<MouvementStock[]>> {
+  return this.http.get<ApiResponse<MouvementStock[]>>(`${this.stocksUrl}/produit/${produitId}/mouvements`).pipe(
+    catchError(error => {
+      console.error('Erreur récupération mouvements:', error);
+      return of({
+        success: false,
+        message: error.error?.message || 'Erreur de connexion',
+        data: []
+      });
+    })
+  );
+}
+
+getAllMouvements(): Observable<ApiResponse<MouvementStock[]>> {
+  return this.http.get<ApiResponse<MouvementStock[]>>(`${this.stocksUrl}/mouvements`).pipe(
+    catchError(error => {
+      console.error('Erreur récupération mouvements:', error);
+      return of({
+        success: false,
+        message: error.error?.message || 'Erreur de connexion',
+        data: []
+      });
+    })
+  );
+}
 
   // ========== UTILITAIRES ==========
   getProduitImage(images: string[]): string {
@@ -576,8 +653,8 @@ export class ProduitService {
     if (typeof stock.emplacement === 'string') {
       return stock.emplacement;
     }
-    if ('nom' in stock.emplacement) {
-      return stock.emplacement.nom;
+    if ('nom_emplacement' in stock.emplacement) {
+      return stock.emplacement.nom_emplacement;
     }
     return 'Emplacement inconnu';
   }
