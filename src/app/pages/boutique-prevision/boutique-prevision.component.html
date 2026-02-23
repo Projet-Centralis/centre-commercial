@@ -1,0 +1,267 @@
+<div class="prevision-container">
+  <!-- Header -->
+  <div class="prevision-header">
+    <div class="header-left">
+      <h1>
+        <i class="bi bi-graph-up-arrow"></i>
+        Prévisions et Analyses
+      </h1>
+      <p class="subtitle">Anticipez vos ventes et optimisez votre stratégie</p>
+    </div>
+    <div class="header-right">
+      <button class="refresh-btn" (click)="refreshData()" [disabled]="isLoading">
+        <i class="bi" [class.bi-arrow-clockwise]="!isLoading" [class.bi-hourglass-split]="isLoading"></i>
+        {{ isLoading ? 'Chargement...' : 'Actualiser' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Message de succès -->
+  <div *ngIf="successMessage" class="success-message">
+    <i class="bi bi-check-circle"></i>
+    {{ successMessage }}
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="bi bi-exclamation-triangle"></i>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loader"></div>
+    <p>Chargement des prévisions...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="prevision-content">
+    <!-- Cartes de chiffre d'affaires -->
+    <div class="ca-grid">
+      <div class="ca-card" (click)="periodeSelectionnee = 'jour'" [class.active]="periodeSelectionnee === 'jour'">
+        <div class="ca-icon">
+          <i class="bi bi-calendar-day"></i>
+        </div>
+        <div class="ca-content">
+          <h3>Aujourd'hui</h3>
+          <div class="ca-value">{{ formatMontant(chiffreAffaires?.actuel?.aujourdhui || 0) }}</div>
+          <div class="ca-objectif">
+            <span>Objectif: {{ formatMontant(chiffreAffaires?.objectifs?.journalier || 0) }}</span>
+            <span class="progression" [style.color]="getObjectifColor()">
+              {{ getProgressionPourcentage() }}%
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ca-card" (click)="periodeSelectionnee = 'semaine'" [class.active]="periodeSelectionnee === 'semaine'">
+        <div class="ca-icon">
+          <i class="bi bi-calendar-week"></i>
+        </div>
+        <div class="ca-content">
+          <h3>Cette semaine</h3>
+          <div class="ca-value">{{ formatMontant(chiffreAffaires?.actuel?.semaine || 0) }}</div>
+          <div class="ca-objectif">
+            <span>Objectif: {{ formatMontant(chiffreAffaires?.objectifs?.hebdomadaire || 0) }}</span>
+            <span class="progression" [style.color]="getObjectifColor()">
+              {{ getProgressionPourcentage() }}%
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ca-card" (click)="periodeSelectionnee = 'mois'" [class.active]="periodeSelectionnee === 'mois'">
+        <div class="ca-icon">
+          <i class="bi bi-calendar-month"></i>
+        </div>
+        <div class="ca-content">
+          <h3>Ce mois</h3>
+          <div class="ca-value">{{ formatMontant(chiffreAffaires?.actuel?.mois || 0) }}</div>
+          <div class="ca-objectif">
+            <span>Objectif: {{ formatMontant(chiffreAffaires?.objectifs?.mensuel || 0) }}</span>
+            <span class="progression" [style.color]="getObjectifColor()">
+              {{ getProgressionPourcentage() }}%
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ca-card" (click)="periodeSelectionnee = 'annee'" [class.active]="periodeSelectionnee === 'annee'">
+        <div class="ca-icon">
+          <i class="bi bi-calendar"></i>
+        </div>
+        <div class="ca-content">
+          <h3>Cette année</h3>
+          <div class="ca-value">{{ formatMontant(chiffreAffaires?.actuel?.annee || 0) }}</div>
+          <div class="ca-objectif">
+            <span>Objectif: {{ formatMontant((chiffreAffaires?.actuel?.annee || 0) * 1.1) }}</span>
+            <span class="progression" [style.color]="getObjectifColor()">
+              {{ getProgressionPourcentage() }}%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barre de progression -->
+    <div class="progress-section" *ngIf="chiffreAffaires">
+      <div class="progress-header">
+        <h3>
+          <i class="bi bi-trophy"></i>
+          Progression vers l'objectif
+        </h3>
+        <span class="progress-percentage" [style.color]="getObjectifColor()">
+          {{ getProgressionPourcentage() }}%
+        </span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar">
+          <div class="progress-fill" 
+               [style.width.%]="getProgressionPourcentage()"
+               [style.background]="getObjectifColor()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prévisions générées -->
+    <div class="previsions-grid" *ngIf="previsionsGenerees">
+      <div class="previsions-card">
+        <div class="card-header">
+          <h3>
+            <i class="bi bi-graph-up"></i>
+            Prévisions automatiques
+          </h3>
+          <span class="badge">
+            {{ previsionsGenerees.statistiques ? (previsionsGenerees.statistiques.joursAnalyse || 0) : 0 }} jours analysés
+          </span>
+        </div>
+
+        <div class="previsions-list">
+          <div *ngFor="let prev of previsionsGenerees.previsions" class="prevision-item">
+            <div class="prevision-date">
+              <span class="jour">{{ formatDate(prev.date) }}</span>
+              <span class="type">{{ prev.type }}</span>
+            </div>
+            <div class="prevision-montant">
+              <span class="montant">{{ formatMontant(prev.montant || 0) }}</span>
+              <span class="probabilite" [style.background]="getProbabiliteColor(prev.probabilite || 0)">
+                {{ prev.probabilite || 0 }}%
+              </span>
+            </div>
+            <div class="prevision-methode">
+              <i class="bi bi-info-circle" [title]="prev.methode || ''"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-mini" *ngIf="previsionsGenerees.statistiques">
+          <ng-container *ngIf="previsionsGenerees.statistiques">
+            <div class="stat-mini">
+              <span class="label">Moyenne journalière</span>
+              <span class="value">{{ formatMontant(previsionsGenerees.statistiques.moyenneJournaliere || 0) }}</span>
+            </div>
+            <div class="stat-mini">
+              <span class="label">Meilleur jour</span>
+              <span class="value">
+                {{ previsionsGenerees.statistiques.meilleurJour ? previsionsGenerees.statistiques.meilleurJour.date : 'N/A' }} - 
+                {{ formatMontant(previsionsGenerees.statistiques.meilleurJour ? previsionsGenerees.statistiques.meilleurJour.montant : 0) }}
+              </span>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Produits prometteurs -->
+      <div class="prometteurs-card" *ngIf="previsionsGenerees.produitsPrometteurs && previsionsGenerees.produitsPrometteurs.length > 0">
+        <div class="card-header">
+          <h3>
+            <i class="bi bi-star"></i>
+            Produits prometteurs
+          </h3>
+          <span class="badge">{{ previsionsGenerees.produitsPrometteurs.length }} produits</span>
+        </div>
+
+        <div class="prometteurs-list">
+          <div *ngFor="let produit of previsionsGenerees.produitsPrometteurs" class="prometteur-item">
+            <div class="prometteur-info">
+              <h4>{{ produit.nom || 'Produit inconnu' }}</h4>
+              <span class="prix">{{ formatMontant(produit.prix || 0) }}</span>
+            </div>
+            <div class="prometteur-stats">
+              <div class="ventes-prevues">
+                <span class="label">Ventes prévues</span>
+                <span class="value">{{ produit.ventesPrevues || 0 }} unités</span>
+              </div>
+              <div class="croissance" [style.color]="getTendanceColor(produit.tendance || 'stable')">
+                <i [class]="getTendanceIcon(produit.tendance || 'stable')"></i>
+                <span>+{{ produit.croissance || 0 }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prévisions de la semaine -->
+    <div class="semaine-card" *ngIf="previsionsSemaine && previsionsSemaine.length > 0">
+      <div class="card-header">
+        <h3>
+          <i class="bi bi-calendar-week"></i>
+          Prévisions de la semaine
+        </h3>
+        <a routerLink="/boutique/previsions" class="view-all">Voir tout</a>
+      </div>
+
+      <div class="semaine-grid">
+        <div *ngFor="let prev of previsionsSemaine" class="semaine-item">
+          <div class="semaine-jour">{{ formatDate(prev.date_prevision) }}</div>
+          <div class="semaine-montant">{{ formatMontant(prev.montant_prevu || 0) }}</div>
+          <div class="semaine-statut" [style.background]="getStatutColor(prev.statut)">
+            {{ getStatutText(prev.statut) }}
+          </div>
+          <div class="semaine-probabilite" [style.background]="getProbabiliteColor(prev.probabilite || 0)">
+            {{ prev.probabilite || 0 }}%
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicateurs supplémentaires -->
+    <div class="indicators-grid" *ngIf="chiffreAffaires">
+      <div class="indicator-card">
+        <div class="indicator-icon">
+          <i class="bi bi-arrow-up"></i>
+        </div>
+        <div class="indicator-content">
+          <h3>Croissance projetée</h3>
+          <div class="indicator-value" [style.color]="(chiffreAffaires.prevision && chiffreAffaires.prevision.croissance ? (chiffreAffaires.prevision.croissance >= 0) : true) ? '#32bcae' : '#ff6b6b'">
+            {{ (chiffreAffaires.prevision && chiffreAffaires.prevision.croissance) || 0 }}%
+          </div>
+          <p>sur les 30 prochains jours</p>
+        </div>
+      </div>
+
+      <div class="indicator-card">
+        <div class="indicator-icon">
+          <i class="bi bi-calendar"></i>
+        </div>
+        <div class="indicator-content">
+          <h3>Prévision 30 jours</h3>
+          <div class="indicator-value">{{ formatMontant((chiffreAffaires.prevision && chiffreAffaires.prevision["30jours"]) || 0) }}</div>
+          <p>chiffre d'affaires estimé</p>
+        </div>
+      </div>
+
+      <div class="indicator-card">
+        <div class="indicator-icon">
+          <i class="bi bi-trophy"></i>
+        </div>
+        <div class="indicator-content">
+          <h3>Objectif mensuel</h3>
+          <div class="indicator-value">{{ formatMontant((chiffreAffaires.objectifs && chiffreAffaires.objectifs.mensuel) || 0) }}</div>
+          <p>à atteindre ce mois</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

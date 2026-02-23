@@ -7,6 +7,169 @@
   color: #ffffff;
 }
 
+/* Ajoutez ces styles à votre fichier CSS */
+
+.chart-loading, .products-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  gap: 15px;
+}
+
+.chart-empty, .products-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  color: rgba(255,255,255,0.5);
+  gap: 15px;
+}
+
+.chart-empty i, .products-empty i {
+  font-size: 48px;
+  opacity: 0.3;
+  color: #32bcae;
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #13514b;
+  border-top-color: #32bcae;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.bar-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.bar {
+  width: 80%;
+  border-radius: 8px 8px 0 0;
+  transition: height 0.3s ease;
+  min-height: 4px;
+}
+
+.bar-value {
+  position: absolute;
+  top: -25px;
+  background: #13514b;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: white;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.bar-label {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.bar-label .day {
+  display: block;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.bar-label .amount {
+  display: block;
+  color: #32bcae;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.bar-label .count {
+  display: block;
+  color: rgba(255,255,255,0.5);
+  font-size: 11px;
+}
+
+.product-rank {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #13514b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* .product-rank.top {
+  background: #32bcae;
+  box-shadow: 0 0 15px rgba(50, 188, 174, 0.5);
+} */
+
+.product-category {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.product-category i {
+  color: #32bcae;
+  font-size: 12px;
+}
+
+.product-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 120px;
+}
+
+.sales-count {
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sales-count i {
+  color: #32bcae;
+  font-size: 14px;
+}
+
+.revenue {
+  color: #32bcae;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.revenue i {
+  font-size: 14px;
+}
+
 /* Header */
 .dashboard-header {
   display: flex;
