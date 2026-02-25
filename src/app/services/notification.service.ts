@@ -35,21 +35,24 @@ export class NotificationService {
   }
 
 
-  startListening() {
-    interval(5000)
-      .pipe(switchMap(() => this.getNotificationsUser()))
-      .subscribe((notifications) => {
-        const unread = notifications.filter(n => !n.read).length; this.unreadCount$.next(unread);
-        this.notificationsSubject.next(notifications);
-        if (notifications.length > 0) {
-          const latest = notifications[0];
-          if (this.lastNotificationId === null) {
-            // Premier appel : on mémorise sans émettre            this.lastNotificationId = latest._id;
-          } else if (latest._id !== this.lastNotificationId) {
-            // Nouvelle notification détectée après l'init            this.popupSubject.next(latest);
-            this.lastNotificationId = latest._id;
-          } else { }
-        }
-      });
-  }
+ startListening() {
+  this.getNotificationsUser().subscribe((notifications) => {
+
+    const unread = notifications.filter(n => !n.read).length;
+    this.unreadCount$.next(unread);
+
+    this.notificationsSubject.next(notifications);
+
+    if (notifications.length > 0) {
+      const latest = notifications[0];
+
+      if (this.lastNotificationId === null) {
+        this.lastNotificationId = latest._id;
+      } else if (latest._id !== this.lastNotificationId) {
+        this.popupSubject.next(latest);
+        this.lastNotificationId = latest._id;
+      }
+    }
+  });
+}
 }
