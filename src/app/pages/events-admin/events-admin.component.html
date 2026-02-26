@@ -68,7 +68,7 @@
   <!-- Modale simple pour afficher les événements d'un jour -->
   <div class="modal" *ngIf="showModal" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <h3>Événements du {{ selectedDayEvents[0]?.date_debut | date:'dd/MM/yyyy' }}</h3>
+      <h3>Événements du {{ selectedDayEvents[0].date_debut | date:'dd/MM/yyyy' }}</h3>
       <div *ngFor="let event of selectedDayEvents" class="modal-event">
         <strong>{{ event.titre }}</strong> - {{ event.boutique.nom_boutique }}
         <div>{{ event.date_debut | date:'HH:mm' }} - {{ event.date_fin | date:'HH:mm' }}</div>

@@ -99,6 +99,7 @@ export interface MouvementStock {
 export class ProduitService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/produits`;
+  private facturesUrl = `${environment.apiUrl}`;
   private categoriesUrl = `${environment.apiUrl}/categories`;
   private stocksUrl = `${environment.apiUrl}/stocks`;
   private emplacementsUrl = `${environment.apiUrl}/emplacements`;
@@ -361,6 +362,18 @@ getAllMouvements(): Observable<ApiResponse<MouvementStock[]>> {
         message: error.error?.message || 'Erreur de connexion',
         data: []
       });
+    })
+  );
+}
+
+// ========== FACTURES DE SORTIE ==========
+telechargerFactureSortie(mouvementId: string): Observable<Blob> {
+  return this.http.get(`${this.facturesUrl}/stocks/facture/${mouvementId}`, {
+    responseType: 'blob'
+  }).pipe(
+    catchError(error => {
+      console.error('Erreur téléchargement facture:', error);
+      throw error;
     })
   );
 }
