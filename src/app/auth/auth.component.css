@@ -1,16 +1,24 @@
-.auth-container {
-  width: 100%;
+.auth-page {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #101324;
+}
+
+.auth-container {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #101324;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   position: relative;
   overflow: hidden;
   padding: 20px;
+  gap: 30px;
+  flex-wrap: wrap;
 }
 
+/* Carte d'authentification */
 .auth-card {
   background: #1a1d2e;
   border-radius: 16px;
@@ -19,24 +27,20 @@
   border: 2px solid #13514b;
   z-index: 10;
   position: relative;
-  margin: 20px auto;
   overflow: hidden;
+  min-width: 420px;
 }
 
 .auth-card.login-mode {
   width: 420px;
- 
 }
+
 .logo {
-  /* margin-top: 8px; */
   height: 120px;
 }
 
 .auth-card.signin-mode {
   width: 500px;
-  /* height: auto; */
-  /* min-height: 600px;
-  max-height: 750px; */
 }
 
 .auth-header {
@@ -166,6 +170,155 @@
   text-decoration: underline;
 }
 
+/* ========== INFORMATIONS DE TEST ========== */
+.test-credentials {
+  background: #1a1d2e;
+  border-radius: 12px;
+  border: 1px solid #13514b;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  align-self: center;
+  transition: all 0.3s ease;
+}
+
+.test-credentials:hover {
+  border-color: #32bcae;
+  box-shadow: 0 6px 25px rgba(50, 188, 174, 0.15);
+}
+
+.test-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 15px;
+  background: #101324;
+  border-bottom: 1px solid #13514b;
+  color: #32bcae;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.test-header i:first-child {
+  font-size: 14px;
+  color: #32bcae;
+}
+
+.test-header i:last-child {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+
+.test-credentials:hover .test-header i:last-child {
+  transform: translateY(2px);
+  color: #32bcae;
+}
+
+.test-content {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.test-role {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: #101324;
+  border-radius: 8px;
+  border-left: 3px solid;
+  transition: all 0.2s ease;
+}
+
+.test-role:hover {
+  transform: translateX(3px);
+  background: #0d0f1a;
+}
+
+.test-role.admin {
+  border-left-color: #ede31e;
+}
+.test-role.boutique {
+  border-left-color: #32bcae;
+}
+.test-role.client {
+  border-left-color: #2de34e;
+}
+
+.role-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: #1a1d2e;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.test-role.admin .role-badge {
+  background: rgba(197, 167, 21, 0.2);
+  color: #ede31e;
+}
+.test-role.boutique .role-badge {
+  background: rgba(50, 188, 174, 0.2);
+  color: #32bcae;
+}
+.test-role.client .role-badge {
+  background: rgba(27, 78, 24, 0.2);
+  color: #2de34e;
+}
+
+.test-details {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.test-details .email {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.test-details .password {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 10px;
+}
+
+.test-details .password-hint {
+  color: #32bcae;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(50, 188, 174, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.project-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed #13514b;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+}
+
+.project-info i {
+  color: #32bcae;
+  font-size: 12px;
+}
+
+/* ========== DECORATION ========== */
 .auth-decoration {
   position: absolute;
   width: 100%;
@@ -194,13 +347,25 @@
   left: -150px;
 }
 
+/* ========== RESPONSIVE ========== */
+@media (max-width: 900px) {
+  .auth-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .test-credentials {
+    width: 100%;
+    max-width: 500px;
+  }
+}
+
 @media (max-width: 768px) {
   .auth-card.login-mode,
   .auth-card.signin-mode {
     width: 95%;
     padding: 25px;
-    max-height: 85vh;
-    min-height: auto;
+    min-width: auto;
   }
   
   .auth-header h1 {
@@ -210,6 +375,11 @@
   .auth-content {
     max-height: 55vh;
   }
+
+  .test-details {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -217,7 +387,6 @@
   .auth-card.signin-mode {
     width: 100%;
     padding: 20px;
-    max-height: 90vh;
   }
   
   .auth-header h1 {
@@ -235,7 +404,12 @@
     max-height: 60vh;
   }
   
-  .auth-container {
-    padding: 10px;
+  .test-role {
+    flex-wrap: wrap;
+  }
+  
+  .test-details {
+    width: 100%;
+    justify-content: space-between;
   }
 }
