@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ export class BoutiqueService {
 
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private apiUrl = 'http://localhost:5000/api/boutiques';
+  // private apiUrl = 'http://localhost:5000/api/boutiques';
+  private apiUrl = `${environment.apiUrl}/boutiques`;
 
   private getHeaders(): HttpHeaders {
     return this.authService.getAuthHeaders();

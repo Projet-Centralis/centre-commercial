@@ -219,71 +219,7 @@ export class BoutiqueLoyerComponent implements OnInit {
     };
   }
 
-  // submitPaiement(): void {
-  //   if (!this.validatePaiementForm()) {
-  //     return;
-  //   }
-
-  //   this.isLoading = true;
-  //   this.errorMessage = '';
-
-  //   let moisDate: Date;
-  //   if (typeof this.paiementForm.mois === 'string') {
-  //     const [year, month] = this.paiementForm.mois.split('-');
-  //     moisDate = new Date(parseInt(year), parseInt(month) - 1, 1);
-  //   } else {
-  //     moisDate = this.paiementForm.mois as Date;
-  //   }
-
-  //   const paiementData = {
-  //     contrat: this.paiementForm.contrat,
-  //     mois: moisDate,
-  //     montant_du: this.paiementForm.montant_du,
-  //     montant_paye: this.paiementForm.montant_paye,
-  //     statut: this.paiementForm.statut
-  //   };
-
-  //   if (this.isEditing && this.paiementSelectionne) {
-  //     this.loyerService.updatePaiement(this.paiementSelectionne._id, paiementData).subscribe({
-  //       next: (response) => {
-  //         if (response.success) {
-  //           this.showSuccess('Paiement mis à jour avec succès');
-  //           this.loadPaiements();
-  //           this.loadStatistiques();
-  //           this.closePaiementModal();
-  //         } else {
-  //           this.errorMessage = response.message || 'Erreur lors de la mise à jour';
-  //         }
-  //         this.isLoading = false;
-  //       },
-  //       error: (error) => {
-  //         console.error('Erreur:', error);
-  //         this.errorMessage = 'Erreur de connexion au serveur';
-  //         this.isLoading = false;
-  //       }
-  //     });
-  //   } else {
-  //     this.loyerService.createPaiement(paiementData).subscribe({
-  //       next: (response) => {
-  //         if (response.success) {
-  //           this.showSuccess('Paiement enregistré avec succès');
-  //           this.loadPaiements();
-  //           this.loadStatistiques();
-  //           this.loadEcheances();
-  //           this.closePaiementModal();
-  //         } else {
-  //           this.errorMessage = response.message || 'Erreur lors de la création';
-  //         }
-  //         this.isLoading = false;
-  //       },
-  //       error: (error) => {
-  //         console.error('Erreur:', error);
-  //         this.errorMessage = 'Erreur de connexion au serveur';
-  //         this.isLoading = false;
-  //       }
-  //     });
-  //   }
-  // }
+  
   submitPaiement(): void {
   if (!this.validatePaiementForm()) {
     return;
