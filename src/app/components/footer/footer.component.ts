@@ -30,8 +30,8 @@ import { CommonModule } from '@angular/common';
             <div class="author">
               <i class="bi bi-person-circle"></i>
               <div class="author-info">
-                <span class="author-name">Ifaliana Beatrix</span>
-                <span class="author-id">ETU000012</span>
+                <span class="author-name">RAZAFINDRABE Mioty Ny Aina Ifaliana Beatrix</span>
+                <span class="author-id">ETU002850</span>
               </div>
             </div>
           </div>
