@@ -261,6 +261,9 @@ export interface Event {
   participants?: number;
   createdAt?: string;
   updatedAt?: string;
+    // Propriétés dynamiques ajoutées par le frontend
+  isLoadingCapacity?: boolean;
+  capacite_restante?: number;
 }
 
 export interface EventDetails {
