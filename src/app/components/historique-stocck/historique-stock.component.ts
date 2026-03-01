@@ -110,7 +110,15 @@ import { ProduitService, MouvementStock, ApiResponse } from '../../services/prod
                     <i class="bi bi-chat"></i>
                     {{ mvt.motif }}
                   </div>
+
+                  <!-- Dans la section des actions, ajoutez ce bouton pour les mouvements de type 'sortie' -->
+<div class="mouvement-actions" *ngIf="mvt.type_mouvement === 'sortie'">
+  <button class="action-btn facture" (click)="telechargerFacture(mvt._id)" title="Télécharger la facture">
+    <i class="bi bi-file-pdf"></i>
+  </button>
+</div>
                 </div>
+                
               </div>
             </div>
           </div>
@@ -508,6 +516,32 @@ import { ProduitService, MouvementStock, ApiResponse } from '../../services/prod
       color: rgba(255,255,255,0.7);
     }
 
+    /* Ajoutez dans votre fichier CSS */
+    .mouvement-actions {
+      display: flex;
+      gap: 5px;
+      margin-left: 10px;
+    }
+
+    .action-btn.facture {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: none;
+      background: rgba(50, 188, 174, 0.2);
+      color: #32bcae;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+.action-btn.facture:hover {
+  background: #32bcae;
+  color: #ffffff;
+  transform: scale(1.1);
+}
     @media (max-width: 768px) {
       .modal-content {
         margin: 10px;
@@ -661,4 +695,25 @@ export class HistoriqueStockComponent implements OnInit, OnChanges {
   close(): void {
     this.closeModal.emit();
   }
+
+  // Ajoutez cette méthode
+telechargerFacture(mouvementId: string): void {
+  this.produitService.telechargerFactureSortie(mouvementId).subscribe({
+    next: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `facture-${mouvementId}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      // Optionnel: Afficher un message de succès
+      console.log('Facture téléchargée avec succès');
+    },
+    error: (error) => {
+      console.error('Erreur téléchargement facture:', error);
+      // Afficher une notification d'erreur
+    }
+  });
+}
 }
