@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap");
+
+
 /* ── Variables ── */
 :host {
   --bg-page: #0d1021;
@@ -936,31 +939,6 @@
    BOUTIQUES COMPONENT — DARK MODE · 100vh strict
    Palette : #0d1021 · #32bcae · #13514b · #fff
    ══════════════════════════════════════════════════════════ */
-
-@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap");
-
-:host {
-  --bg-page:   #0d1021;
-  --bg-card:   #151929;
-  --bg-card2:  #1b2035;
-  --bg-input:  #0f1424;
-  --border:    rgba(255, 255, 255, 0.07);
-  --teal:      #32bcae;
-  --teal-dark: #13514b;
-  --teal-dim:  rgba(50, 188, 174, 0.12);
-  --teal-glow: rgba(50, 188, 174, 0.28);
-  --white:     #ffffff;
-  --text-main: #e8edf5;
-  --text-muted:#6a7590;
-  --text-sub:  #3f4d66;
-  --radius:    14px;
-  --radius-sm: 10px;
-  --shadow:    0 8px 40px rgba(0, 0, 0, 0.55);
-  font-family: "DM Sans", sans-serif;
-  display: block;
-  height: 100vh;
-  overflow: hidden;
-}
 
 /* ══════════════════════
    CONTAINER PRINCIPAL
