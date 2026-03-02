@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({
     providedIn: 'root'
@@ -10,8 +11,8 @@ export class ForumService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    private apiUrlDiscussion = 'http://localhost:5000/api/discussions';
-    private apiUrlCommenatire = 'http://localhost:5000/api/commentaires';
+    private apiUrlDiscussion =  `${environment.apiUrl}/discussions`;
+    private apiUrlCommenatire = `${environment.apiUrl}/commentaires`;
 
     private getHeaders(): HttpHeaders {
         return this.authService.getAuthHeaders();

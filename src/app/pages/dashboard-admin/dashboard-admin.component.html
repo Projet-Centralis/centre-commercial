@@ -1,1 +1,169 @@
-<p>dashboard-admin works!</p>
+
+<div class="dashboard-container">
+  <!-- En-tête -->
+  <div class="dashboard-header">
+    <div class="header-title">
+      <i class="fas fa-chart-pie header-icon"></i>
+      <h1>Tableau de bord administrateur</h1>
+    </div>
+    <button class="refresh-btn" (click)="refresh()" [disabled]="isAnyLoading()">
+      <i class="fas fa-sync-alt" [class.fa-spin]="isAnyLoading()"></i>
+      <span>Actualiser</span>
+    </button>
+  </div>
+
+  <!-- Cartes principales -->
+  <div class="cards-grid">
+    <!-- CA Global -->
+    <div class="card card-gradient">
+      <div class="card-header">
+        <div class="card-header-left">
+          <i class="fas fa-euro-sign card-icon"></i>
+          <h2>Chiffre d'affaires</h2>
+        </div>
+        <span class="card-badge">Global</span>
+      </div>
+      <div class="card-content">
+        @if (loadingCaGlobal) {
+          <div class="loading-container">
+            <div class="loading-spinner"></div>
+          </div>
+        } @else if (errorCaGlobal) {
+          <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>{{ errorCaGlobal }}</span>
+          </div>
+        } @else if (caGlobal) {
+          <div class="ca-global">
+            <div class="ca-value">{{ formatCurrency(caGlobal.caTotal) }}</div>
+            <div class="ca-detail">
+              <i class="fas fa-shopping-cart"></i>
+              <span>{{ caGlobal.nombreVentes }} ventes</span>
+            </div>
+          </div>
+        } @else {
+          <div class="no-data">
+            <i class="fas fa-chart-line"></i>
+            <span>Aucune donnée</span>
+          </div>
+        }
+      </div>
+    </div>
+
+  <!-- Tableau Top Ventes -->
+  <div class="card full-width">
+    <div class="card-header">
+      <div class="card-header-left">
+        <i class="fas fa-trophy card-icon"></i>
+        <h2>Top ventes par boutique</h2>
+      </div>
+      <span class="card-badge">{{ topVentes.length }} boutiques</span>
+    </div>
+    <div class="card-content">
+      @if (loadingTopVentes) {
+        <div class="loading-container">
+          <div class="loading-spinner"></div>
+        </div>
+      } @else if (errorTopVentes) {
+        <div class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>{{ errorTopVentes }}</span>
+        </div>
+      } @else if (topVentes.length === 0) {
+        <div class="no-data">
+          <i class="fas fa-store-alt"></i>
+          <span>Aucune vente enregistrée</span>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-store"></i> Boutique</th>
+                <th><i class="fas fa-envelope"></i> Email</th>
+                <th><i class="fas fa-cubes"></i> Quantité</th>
+                <th><i class="fas fa-chart-line"></i> CA généré</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (vente of topVentes; track vente._id; let i = $index) {
+                <tr>
+                  <td class="boutique-cell">
+                    <span class="rank-badge" [class.rank-1]="i === 0" [class.rank-2]="i === 1" [class.rank-3]="i === 2">
+                      @if (i === 0) {
+                        <i class="fas fa-crown"></i>
+                      } @else if (i === 1) {
+                        <i class="fas fa-medal"></i>
+                      } @else if (i === 2) {
+                        <i class="fas fa-award"></i>
+                      } @else {
+                        {{ i + 1 }}
+                      }
+                    </span>
+                    {{ vente.nom_boutique }}
+                  </td>
+                  <td>{{ vente.email }}</td>
+                  <td class="quantity-cell">{{ vente.totalQuantite }}</td>
+                  <td class="ca-cell">{{ formatCurrency(vente.totalCA) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Tableau Loyers Impayés -->
+  <div class="card full-width">
+    <div class="card-header">
+      <div class="card-header-left">
+        <i class="fas fa-exclamation-circle card-icon"></i>
+        <h2>Loyers impayés</h2>
+      </div>
+      <span class="card-badge warning">{{ loyersImpayes.length }} boutiques</span>
+    </div>
+    <div class="card-content">
+      @if (loadingLoyers) {
+        <div class="loading-container">
+          <div class="loading-spinner"></div>
+        </div>
+      } @else if (errorLoyers) {
+        <div class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>{{ errorLoyers }}</span>
+        </div>
+      } @else if (loyersImpayes.length === 0) {
+        <div class="no-data">
+          <i class="fas fa-check-circle" style="color: #32bcae;"></i>
+          <span>Aucun impayé</span>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-store"></i> Boutique</th>
+                <th><i class="fas fa-money-bill-wave"></i> Total impayé</th>
+                <th><i class="fas fa-calendar-alt"></i> Mois impayés</th>
+                <th><i class="fas fa-calendar-plus"></i> Plus ancien</th>
+                <th><i class="fas fa-calendar-check"></i> Dernier mois</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (impaye of loyersImpayes; track impaye._id) {
+                <tr>
+                  <td class="boutique-cell">{{ impaye._id }}</td>
+                  <td class="impaye-cell">{{ formatCurrency(impaye.totalImpaye) }}</td>
+                  <td class="mois-cell">{{ impaye.nombreMoisImpayes }} mois</td>
+                  <td>{{ formatDate(impaye.moisPlusAncien) }}</td>
+                  <td>{{ formatDate(impaye.dernierMoisImpaye) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>
