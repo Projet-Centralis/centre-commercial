@@ -4,125 +4,59 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
+export interface VenteJournaliere {
+  date: string;
+  montant: number;
+  nombreVentes: number;
+}
+
+export interface ProduitPopulaire {
+  _id?: string;
+  nom: string;
+  categorie: string;
+  ventes: number;
+  revenu: number;
+  tendance: 'up' | 'down' | 'stable';
+}
+
+export interface StatistiquesVentes {
+  ventesTotales: {
+    quantite: number;
+    montant: number;
+  };
+  ventesAujourdhui: {
+    quantite: number;
+    montant: number;
+  };
+  ventesJournalieres: VenteJournaliere[];
+  produitsPopulaires: ProduitPopulaire[];
+  nombreClients: number;
+  nouveauxClients: number;
+  tauxConversion: number;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message?: string;
   data?: T;
 }
 
-/* =========================
-   TOP VENTES
-========================= */
-export interface TopVente {
-  _id: string;
-  totalQuantite: number;
-  totalCA: number;
-  boutiqueId: string;
-  nom_boutique: string;
-  email: string;
-}
-
-/* =========================
-   LOYERS IMPAYÉS
-========================= */
-export interface LoyerImpaye {
-  _id: string; // boutique id
-  totalImpaye: number;
-  nombreMoisImpayes: number;
-  moisPlusAncien: string;
-  dernierMoisImpaye: string;
-}
-
-/* =========================
-   CA GLOBAL
-========================= */
-export interface CAGlobal {
-  _id: null;
-  caTotal: number;
-  nombreVentes: number;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class StatistiquesService {
-
   private http = inject(HttpClient);
-
   private apiUrl = `${environment.apiUrl}/statistiques`;
-  private apiUrlAdmin = `${environment.apiUrl}/stat_admin`;
 
-  /* =========================
-     STATS VENTES EXISTANTES
-  ========================= */
-  getVentesStats(): Observable<ApiResponse<any>> {
-    return this.http
-      .get<ApiResponse<any>>(`${this.apiUrl}/ventes`)
-      .pipe(
-        catchError(error => {
-          console.error('Erreur statistiques ventes:', error);
-          return of({
-            success: false,
-            message: error.error?.message || 'Erreur de connexion'
-          });
-        })
-      );
-  }
-
-  /* =========================
-     TOP VENTES
-  ========================= */
-  getTopVentes(): Observable<ApiResponse<TopVente[]>> {
-    return this.http
-      .get<ApiResponse<TopVente[]>>(
-        `${this.apiUrlAdmin}/top-ventes`
-      )
-      .pipe(
-        catchError(error => {
-          console.error('Erreur top ventes:', error);
-          return of({
-            success: false,
-            message: 'Impossible de récupérer les top ventes'
-          });
-        })
-      );
-  }
-
-  /* =========================
-     LOYERS IMPAYÉS
-  ========================= */
-  getLoyersImpayes(): Observable<ApiResponse<LoyerImpaye[]>> {
-    return this.http
-      .get<ApiResponse<LoyerImpaye[]>>(
-        `${this.apiUrlAdmin}/loyers-impayes`
-      )
-      .pipe(
-        catchError(error => {
-          console.error('Erreur loyers impayés:', error);
-          return of({
-            success: false,
-            message: 'Impossible de récupérer les loyers impayés'
-          });
-        })
-      );
-  }
-
-  /* =========================
-     CA GLOBAL
-  ========================= */
-  getCAGlobal(): Observable<ApiResponse<CAGlobal>> {
-    return this.http
-      .get<ApiResponse<CAGlobal>>(
-        `${this.apiUrlAdmin}/ca-global`
-      )
-      .pipe(
-        catchError(error => {
-          console.error('Erreur CA global:', error);
-          return of({
-            success: false,
-            message: 'Impossible de récupérer le CA global'
-          });
-        })
-      );
+  getVentesStats(): Observable<ApiResponse<StatistiquesVentes>> {
+    return this.http.get<ApiResponse<StatistiquesVentes>>(`${this.apiUrl}/ventes`).pipe(
+      catchError(error => {
+        console.error('Erreur récupération statistiques:', error);
+        return of({
+          success: false,
+          message: error.error?.message || 'Erreur de connexion'
+        });
+      })
+    );
   }
 }
