@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://centralis-backend.onrender.com' // URL de production
+  apiUrl: 'https://centralis-backend.onrender.com/api' // URL de production
 };
 
 // export const environment = {
