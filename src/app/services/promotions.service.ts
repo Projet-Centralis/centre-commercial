@@ -11,7 +11,7 @@ export class PromotionService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    private apiUrl =  `${environment.apiUrl}/api/promotions`;
+    private apiUrl =  `${environment.apiUrl}/promotions`;
 
     private getHeaders(): HttpHeaders {
         return this.authService.getAuthHeaders();
