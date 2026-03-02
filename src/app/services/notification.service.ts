@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, interval, switchMap, BehaviorSubject, Subject } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class NotificationService {
 
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private apiUrl = 'http://localhost:5000/api/notifications';
+  private apiUrl =  `${environment.apiUrl}/notifications`;
 
   // Pour le nombre de notifications non lues
   private unreadCount$ = new BehaviorSubject<number>(0);
