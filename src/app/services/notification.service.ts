@@ -11,7 +11,7 @@ export class NotificationService {
 
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private apiUrl =  `${environment.apiUrl}/notifications`;
+  private apiUrl =  `${environment.apiUrl}/api/notifications`;
 
   // Pour le nombre de notifications non lues
   private unreadCount$ = new BehaviorSubject<number>(0);
