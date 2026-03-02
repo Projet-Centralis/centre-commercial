@@ -1,4 +1,4 @@
-<div class="auth-container">
+<!-- <div class="auth-container">
   <div [class]="getCardClass()">
     <div class="auth-header">
       <h1>
@@ -43,4 +43,163 @@
     <div class="decoration-circle" style="background: #32bcae;"></div>
     <div class="decoration-circle" style="background: #13514b;"></div>
   </div>
+</div> -->
+
+<!-- <div class="auth-page">
+  <div class="auth-container">
+    <div [class]="getCardClass()">
+      <div class="auth-header">
+        <h1>
+         <img src="/logo.png" alt="Logo" class="logo">
+        </h1>
+        <p class="auth-subtitle">Accédez à votre espace personnel</p>
+      </div>
+
+      <div class="mode-toggle">
+        <button 
+          class="mode-btn" 
+          [class.active]="isLoginMode"
+          (click)="isLoginMode = true">
+          <i class="bi bi-box-arrow-in-right"></i>
+          Connexion
+        </button>
+        <button 
+          class="mode-btn" 
+          [class.active]="!isLoginMode"
+          (click)="isLoginMode = false">
+          <i class="bi bi-person-plus"></i>
+          Inscription
+        </button>
+      </div>
+
+      <div class="auth-content">
+        <app-login *ngIf="isLoginMode"></app-login>
+        <app-signin *ngIf="!isLoginMode"></app-signin>
+      </div>
+
+      <div class="auth-footer">
+        <p>
+          {{ isLoginMode ? 'Nouveau chez nous ?' : 'Déjà un compte ?' }}
+          <button class="switch-link" (click)="toggleMode()">
+            {{ isLoginMode ? 'Créer un compte' : 'Se connecter' }}
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <div class="auth-decoration">
+      <div class="decoration-circle" style="background: #32bcae;"></div>
+      <div class="decoration-circle" style="background: #13514b;"></div>
+    </div>
+  </div>
+  
+  
+  <app-footer></app-footer>
+</div> -->
+
+<div class="auth-page">
+  <div class="auth-container">
+    <div [class]="getCardClass()">
+      <div class="auth-header">
+        <h1>
+         <img src="/logo.png" alt="Logo" class="logo">
+        </h1>
+        <p class="auth-subtitle">Accédez à votre espace personnel</p>
+      </div>
+
+      <div class="mode-toggle">
+        <button 
+          class="mode-btn" 
+          [class.active]="isLoginMode"
+          (click)="isLoginMode = true">
+          <i class="bi bi-box-arrow-in-right"></i>
+          Connexion
+        </button>
+        <button 
+          class="mode-btn" 
+          [class.active]="!isLoginMode"
+          (click)="isLoginMode = false">
+          <i class="bi bi-person-plus"></i>
+          Inscription
+        </button>
+      </div>
+
+      <div class="auth-content">
+        <app-login *ngIf="isLoginMode"></app-login>
+        <app-signin *ngIf="!isLoginMode"></app-signin>
+      </div>
+
+      <div class="auth-footer">
+        <p>
+          {{ isLoginMode ? 'Nouveau chez nous ?' : 'Déjà un compte ?' }}
+          <button class="switch-link" (click)="toggleMode()">
+            {{ isLoginMode ? 'Créer un compte' : 'Se connecter' }}
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <!-- Informations de test - discrètes mais lisibles -->
+    <div class="test-credentials">
+      <div class="test-header">
+        <i class="bi bi-info-circle"></i>
+        <span>Comptes de test</span>
+        <i class="bi bi-chevron-down"></i>
+      </div>
+      
+      <div class="test-content">
+        <!-- Admin -->
+        <div class="test-role admin">
+          <div class="role-badge">ADMIN</div>
+          <div class="test-details">
+            <span class="email">ifaliana&#64;test.com</span>
+            <span class="password">|  Password : </span>
+            <span class="password-hint">12345678</span>
+          </div>
+        </div>
+
+        <!-- Boutiques -->
+        <div class="test-role boutique">
+          <div class="role-badge">BOUTIQUE 1</div>
+          <div class="test-details">
+            <span class="email">isma&#64;test.com</span>
+            <span class="password">|  Password : </span>
+            <span class="password-hint">12345678</span>
+          </div>
+        </div>
+
+        <div class="test-role boutique">
+          <div class="role-badge">BOUTIQUE 2</div>
+          <div class="test-details">
+            <span class="email">userNike&#64;test.com</span>
+            <span class="password">|  Password : </span>
+            <span class="password-hint">12345678</span>
+          </div>
+        </div>
+
+        <!-- Client -->
+        <div class="test-role client">
+          <div class="role-badge">CLIENT</div>
+          <div class="test-details">
+            <span class="email">andry&#64;test.com</span>
+            <span class="password">|  Password : </span>
+            <span class="password-hint">12345678</span>
+          </div>
+        </div>
+
+        <!-- Info projet -->
+        <div class="project-info">
+          <i class="bi bi-code-slash"></i>
+          <span>Centralis • Projet MEAN Master 1 - Mars 2026</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-decoration">
+      <div class="decoration-circle" style="background: #32bcae;"></div>
+      <div class="decoration-circle" style="background: #13514b;"></div>
+    </div>
+  </div>
+  
+  <app-footer></app-footer>
 </div>
