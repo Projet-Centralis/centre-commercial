@@ -1,4 +1,4 @@
-
+/* 
 .app-container {
   height: 100vh;
   display: flex;
@@ -15,4 +15,26 @@
   flex: 1;
   padding: 20px;
   background: #101324;
+} */
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #101324;
 }
+
+.content {
+  flex: 1;
+  display: flex;
+  min-height: 0; /* Important pour le scroll */
+}
+
+.page-content {
+  flex: 1;
+  padding: 20px;
+  background: #101324;
+  overflow-y: auto; /* Permet le scroll du contenu */
+}
+
+/* Le footer sera automatiquement poussé en bas grâce à flex column */
