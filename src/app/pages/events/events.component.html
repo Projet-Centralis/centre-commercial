@@ -57,11 +57,6 @@
               <span><i class="bi bi-clock"></i> {{ formatTime(event.date_debut) }}</span>
             </div>
           </div>
-          <div class="ev-my-places">
-            <span class="places-num" *ngIf="!event.isLoadingCapacity">{{ event.capacite_restante || 0 }}</span>
-            <span class="places-num" *ngIf="event.isLoadingCapacity">…</span>
-            <span class="places-label">places</span>
-          </div>
         </div>
 
       </div>
